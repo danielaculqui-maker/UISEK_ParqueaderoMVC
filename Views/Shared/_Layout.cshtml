@@ -1,43 +1,124 @@
-﻿<!DOCTYPE html>
-<html>
+﻿@{
+    var correo = (string)Session["Correo"];
+    var rol = (string)Session["Rol"];
+    var nombreSistema = "UISEK Parqueadero Inteligente";
+}
+
+@{
+    var dislexia = (Session["ModoDislexia"] as bool?) ?? false;
+    var oscuro = (Session["ModoOscuro"] as bool?) ?? false;
+    var contraste = (Session["AltoContraste"] as bool?) ?? false;
+
+    var bodyClass = "";
+    if (dislexia) { bodyClass += " dislexia"; }
+    if (oscuro) { bodyClass += " oscuro"; }
+    if (contraste) { bodyClass += " contraste"; }
+}
+<!DOCTYPE html>
+<html lang="es">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Mi aplicación ASP.NET</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/Imagenes/carro.png")" />
+    <link rel="shortcut icon" href="@Url.Content("~/Content/Imagenes/carro.png")" />
+    <title>@ViewBag.Title - @nombreSistema</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f6f7fb;
+        }
+
+        .topbar {
+            background: #111;
+            color: #fff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background: #1f6feb;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 48px);
+        }
+
+        aside {
+            width: 260px;
+            background: #fff;
+            border-right: 1px solid #e6e6e6;
+            padding: 14px;
+        }
+
+        main {
+            flex: 1;
+            padding: 18px;
+        }
+
+        .menu a {
+            display: block;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #111;
+            margin-bottom: 6px;
+        }
+
+            .menu a:hover {
+                background: #eef3ff;
+            }
+
+        .card {
+            background: #fff;
+            padding: 16px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        }
+
+        .muted {
+            color: #555;
+            font-size: 13px;
+        }
+
+        /* Accesibilidad: foco visible */
+        a:focus, button:focus {
+            outline: 3px solid #111;
+            outline-offset: 2px;
+        }
+
+
+    </style>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Nombre de la aplicación", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Acerca de", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contacto", "Contact", "Home")</li>
-                </ul>
-            </div>
+    <header class="topbar">
+        <div>
+            <strong>@nombreSistema</strong>
+            <span class="badge">Sistema: ACTIVO</span>
         </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Mi aplicación ASP.NET</p>
-        </footer>
-    </div>
+        <div>
+            <span class="muted" style="color:#ddd;">
+                @((correo ?? "Invitado")) | Rol: @((rol ?? "N/A"))
+            </span>
+        </div>
+    </header>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+    <div class="container">
+        <aside>
+            @Html.Partial("_Menu")
+            <hr />
+            @Html.Partial("_AccessibilityBar")
+        </aside>
+
+        <main>
+            @RenderBody()
+        </main>
+    </div>
 </body>
 </html>

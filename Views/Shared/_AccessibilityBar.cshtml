@@ -1,0 +1,91 @@
+﻿@*
+    Barra de Accesibilidad
+    Proyecto: UISEK Parqueadero Inteligente
+    Tipo: Partial View (sin Layout)
+*@
+
+<div class="card" style="margin-top:12px;">
+    <strong>Accesibilidad</strong>
+    <p class="muted">Preferencias visuales guardadas por sesión.</p>
+
+    <button type="button"
+            onclick="togglePref('ToggleDislexia')"
+            aria-pressed="false">
+        📖 Modo Dislexia
+    </button>
+
+    <button type="button"
+            onclick="togglePref('ToggleOscuro')"
+            style="margin-top:8px;"
+            aria-pressed="false">
+        🌙 Modo Oscuro
+    </button>
+
+    <button type="button"
+            onclick="togglePref('ToggleAltoContraste')"
+            style="margin-top:8px;"
+            aria-pressed="false">
+        🌓 Alto Contraste
+    </button>
+
+    <script>
+        function togglePref(actionName) {
+            fetch('/Accesibilidad/' + actionName, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                }
+            }).then(function () {
+                location.reload();
+            });
+        }
+    </script>
+
+    <style>
+        /* ===== MODO DISLEXIA ===== */
+        body.dislexia {
+            letter-spacing: 0.04em;
+            line-height: 1.6;
+        }
+
+        /* ===== MODO OSCURO ===== */
+        body.oscuro {
+            background: #0b0f19;
+            color: #ffffff;
+        }
+
+            body.oscuro .topbar {
+                background: #000000;
+            }
+
+            body.oscuro aside,
+            body.oscuro .card {
+                background: #111111;
+                color: #ffffff;
+                border-color: #333333;
+            }
+
+            body.oscuro .menu a {
+                color: #ffffff;
+            }
+
+                body.oscuro .menu a:hover {
+                    background: #1a2338;
+                }
+
+        /* ===== ALTO CONTRASTE (BAJA VISIÓN) ===== */
+        body.contraste {
+            background: #ffffff;
+            color: #000000;
+        }
+
+            body.contraste .topbar {
+                background: #000000;
+                color: #ffffff;
+            }
+
+            body.contraste .menu a {
+                border: 2px solid #000000;
+            }
+    </style>
+</div>

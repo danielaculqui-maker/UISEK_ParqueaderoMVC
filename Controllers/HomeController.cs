@@ -10,6 +10,10 @@ namespace UISEK_ParqueaderoMVC.Controllers
     {
         public ActionResult Index()
         {
+            // Si no hay sesión, manda al login
+            if (Session["Rol"] == null)
+                return RedirectToAction("Login", "Auth");
+
             return View();
         }
 

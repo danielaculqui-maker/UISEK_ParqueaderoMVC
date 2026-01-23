@@ -1,0 +1,376 @@
+﻿@{
+    ViewBag.Title = "Registro de Visitante";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Registro Visitante - UISEK Parqueadero Inteligente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="icon" type="image/png" href="@Url.Content("~/Content/Imagenes/carro.png")" />
+    <link rel="shortcut icon" href="@Url.Content("~/Content/Imagenes/carro.png")" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(rgba(246, 247, 251, 0.75), rgba(246, 247, 251, 0.75)), url('/Content/Imagenes/fondo_uisek.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .box {
+            max-width: 520px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0 0 6px 0;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #555;
+            margin: 6px 0 0 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 14px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+            button[type="submit"] {
+                background: #1f6feb;
+                color: white;
+                font-weight: bold;
+                border: none;
+                margin-top: 18px;
+                cursor: pointer;
+            }
+
+        a {
+            display: inline-block;
+            margin-top: 14px;
+        }
+
+        /* Barra accesibilidad */
+        .a11y-bar {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .a11y-btn {
+            width: auto;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+            .a11y-btn:hover {
+                background: #f2f2f2;
+            }
+
+        /* Focus visible */
+        :focus-visible {
+            outline: 4px solid #ffbf00;
+            outline-offset: 3px;
+        }
+
+        /* Error */
+        .error {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #c00;
+            background: #fff5f5;
+            color: #000;
+        }
+
+        /* Dislexia */
+        body.dislexia {
+            letter-spacing: 0.04em;
+            line-height: 1.6;
+        }
+
+        /* Oscuro */
+        body.oscuro {
+            background: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.85)), url('/Content/Imagenes/fondo_uisek.png');
+            color: #fff;
+        }
+
+            body.oscuro .box {
+                background: #111827;
+                color: #fff;
+                border: 1px solid #2b3447;
+            }
+
+            body.oscuro input, body.oscuro select {
+                background: #0b0f19;
+                color: #fff;
+                border-color: #2b3447;
+            }
+
+            body.oscuro .hint {
+                color: #cbd5e1;
+            }
+
+            body.oscuro .a11y-btn {
+                background: #0b0f19;
+                color: #fff;
+                border-color: #2b3447;
+            }
+
+        /* Contraste (modo supremo) */
+        body.contraste {
+            background: #fff !important;
+            color: #000 !important;
+        }
+
+            body.contraste .box {
+                background: #fff !important;
+                color: #000 !important;
+                border: 3px solid #000;
+                box-shadow: none;
+            }
+
+            body.contraste input, body.contraste select {
+                background: #fff !important;
+                color: #000 !important;
+                border: 2px solid #000 !important;
+            }
+
+            body.contraste .hint {
+                color: #000 !important;
+            }
+
+            body.contraste .a11y-btn {
+                background: #fff;
+                color: #000;
+                border: 2px solid #000;
+            }
+
+            body.contraste button[type="submit"] {
+                background: #000 !important;
+                color: #fff !important;
+                border: 2px solid #000 !important;
+            }
+
+        /* Caja fin manual */
+        #finManualBox {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px dashed #1f6feb;
+            background: #f2f6ff;
+        }
+
+        body.oscuro #finManualBox {
+            background: #0b0f19;
+            border-color: #4f7cff;
+        }
+
+        body.contraste #finManualBox {
+            background: #fff;
+            border: 2px dashed #000;
+        }
+
+        .footer-actions {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .btn-link {
+            display: inline-block;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            color: #1f6feb;
+        }
+
+            .btn-link:hover {
+                background: #f2f2f2;
+            }
+
+        body.oscuro .btn-link {
+            background: #0b0f19;
+            color: #9bb4ff;
+            border-color: #2b3447;
+        }
+
+        body.contraste .btn-link {
+            background: #fff;
+            border: 2px solid #000;
+            color: #000;
+        }
+
+    </style>
+</head>
+
+<body>
+    <main class="box" aria-labelledby="titulo">
+        <!-- Accesibilidad -->
+        <div class="a11y-bar" role="region" aria-label="Accesibilidad">
+            <button type="button" class="a11y-btn" onclick="setTheme('claro')">☀️ Claro</button>
+            <button type="button" class="a11y-btn" onclick="setTheme('oscuro')">🌙 Oscuro</button>
+            <button type="button" class="a11y-btn" onclick="toggleClass('contraste')">🌓 Contraste</button>
+            <button type="button" class="a11y-btn" onclick="toggleClass('dislexia')">📖 Dislexia</button>
+        </div>
+
+        <h1 id="titulo">Registro temporal de visitante</h1>
+        <p class="hint">Acceso limitado. Datos simulados para UISEK Parqueadero Inteligente.</p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error" role="alert">@ViewBag.Error</div>
+        }
+
+        @using (Html.BeginForm("RegistroVisitante", "Auth", FormMethod.Post, new { autocomplete = "on" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <label for="nombre">Nombre completo</label>
+            <input id="nombre" name="nombre" required tabindex="1" autocomplete="name" />
+
+            <label for="cedula">Cédula (simulada)</label>
+            <input id="cedula" name="cedula" required tabindex="2" inputmode="numeric" />
+
+            <label for="placa">Placa del vehículo</label>
+            <input id="placa" name="placa" required tabindex="3" placeholder="ABC-1234" />
+
+            <label for="motivo">Motivo de visita</label>
+            <select id="motivo" name="motivo" required tabindex="4">
+                <option value="">Seleccione</option>
+                <option value="TRAMITE">Trámite administrativo</option>
+                <option value="EVENTO">Evento / charla</option>
+                <option value="ACADEMICO">Reunión académica</option>
+                <option value="SALUD_ODONTOLOGIA">Chequeo médico / Odontología</option>
+                <option value="OTRO">Otro</option>
+            </select>
+
+            <label for="duracionHoras">Duración estimada</label>
+            <select id="duracionHoras" name="duracionHoras" required tabindex="5" onchange="onDuracionChange()">
+                <option value="1">1 hora</option>
+                <option value="2">2 horas</option>
+                <option value="4" selected>4 horas</option>
+                <option value="8">8 horas (salud/odontología)</option>
+                <option value="0">Otro (elegir fecha/hora fin)</option>
+            </select>
+
+            <div id="finManualBox" style="display:none;">
+                <label for="finManual">Fecha y hora fin</label>
+                <input id="finManual"
+                       name="finManual"
+                       type="datetime-local"
+                       tabindex="6"
+                       aria-describedby="finHelp" />
+                <div id="finHelp" class="hint">
+                    Solo si elegiste “Otro”. Debe ser mayor a la hora actual.
+                </div>
+            </div>
+
+            <label for="correoContacto">Correo de contacto (opcional)</label>
+            <input id="correoContacto" name="correoContacto" tabindex="7" type="email" placeholder="visitante@gmail.com" />
+
+            <button type="submit" tabindex="8">Registrar y continuar</button>
+        }
+
+        <div class="footer-actions">
+            <a class="btn-link" href="@Url.Action("Login", "Auth")">
+                ← Volver al login
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        // ===== Persistencia A11y (igual filosofía que Login) =====
+        (function () {
+            var theme = localStorage.getItem("uiseK_theme") || "claro";
+
+            if (theme === "oscuro") document.body.classList.add("oscuro");
+
+            if (localStorage.getItem("uiseK_dislexia") === "1") {
+                document.body.classList.add("dislexia");
+            }
+
+            // Contraste manda sobre temas
+            if (localStorage.getItem("uiseK_contraste") === "1") {
+                document.body.classList.add("contraste");
+                document.body.classList.remove("oscuro");
+                localStorage.setItem("uiseK_theme", "claro");
+            }
+        })();
+
+        function setTheme(mode) {
+            // Si elige claro u oscuro, apaga contraste
+            document.body.classList.remove("contraste");
+            localStorage.setItem("uiseK_contraste", "0");
+
+            localStorage.setItem("uiseK_theme", mode);
+
+            document.body.classList.remove("oscuro");
+            if (mode === "oscuro") document.body.classList.add("oscuro");
+        }
+
+        function toggleClass(cls) {
+            if (cls === "contraste") {
+                var activo = document.body.classList.toggle("contraste");
+                localStorage.setItem("uiseK_contraste", activo ? "1" : "0");
+
+                // Contraste apaga oscuro
+                if (activo) {
+                    document.body.classList.remove("oscuro");
+                    localStorage.setItem("uiseK_theme", "claro");
+                }
+                return;
+            }
+
+            document.body.classList.toggle(cls);
+            localStorage.setItem("uiseK_" + cls, document.body.classList.contains(cls) ? "1" : "0");
+        }
+
+        function onDuracionChange() {
+            var dur = document.getElementById("duracionHoras").value;
+            var box = document.getElementById("finManualBox");
+            var fin = document.getElementById("finManual");
+
+            if (dur === "0") {
+                box.style.display = "block";
+                fin.focus();
+            } else {
+                box.style.display = "none";
+                fin.value = "";
+            }
+        }
+    </script>
+</body>
+</html>
