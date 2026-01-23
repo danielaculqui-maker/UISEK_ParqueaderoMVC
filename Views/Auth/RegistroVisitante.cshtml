@@ -299,8 +299,19 @@
 
             <label for="correoContacto">Correo de contacto (opcional)</label>
             <input id="correoContacto" name="correoContacto" tabindex="7" type="email" placeholder="visitante@gmail.com" />
+            <!-- ===== GEOLOCALIZACIÓN (OCULTA) ===== -->
+            <input type="hidden" id="geoLat" name="geoLat" />
+            <input type="hidden" id="geoLng" name="geoLng" />
+            <input type="hidden" id="geoPrecision" name="geoPrecision" />
+            <input type="hidden" id="geoFuente" name="geoFuente" value="NINGUNA" />
+            <button type="button"
+                    onclick="obtenerUbicacion()"
+                    style="margin-top:10px;"
+                    tabindex="8">
+                📍 Obtener ubicación (simulada)
+            </button>
 
-            <button type="submit" tabindex="8">Registrar y continuar</button>
+            <button type="submit" tabindex="9">Registrar y continuar</button>
         }
 
         <div class="footer-actions">
@@ -370,6 +381,33 @@
                 box.style.display = "none";
                 fin.value = "";
             }
+        }
+
+            function obtenerUbicacion() {
+            if (!navigator.geolocation) {
+                alert("Tu navegador no soporta geolocalización.");
+            return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                document.getElementById("geoLat").value = pos.coords.latitude.toFixed(6);
+            document.getElementById("geoLng").value = pos.coords.longitude.toFixed(6);
+            document.getElementById("geoPrecision").value = pos.coords.accuracy;
+            document.getElementById("geoFuente").value = "NAVEGADOR";
+
+            alert("Ubicación registrada correctamente ✔️");
+                },
+            function () {
+                // Simulada si falla
+                document.getElementById("geoLat").value = "-0.180653";
+            document.getElementById("geoLng").value = "-78.467834";
+            document.getElementById("geoPrecision").value = "SIMULADA";
+            document.getElementById("geoFuente").value = "SIMULADA";
+
+            alert("No se pudo obtener ubicación real. Se usó ubicación simulada.");
+                }
+            );
         }
     </script>
 </body>

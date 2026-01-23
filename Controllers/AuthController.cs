@@ -52,20 +52,19 @@ namespace UISEK_ParqueaderoMVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult RegistroVisitante(
-            string nombre,
-            string cedula,
-            string placa,
-            string correoContacto,
-            string motivo,
-            int duracionHoras,
-            string finManual,   // datetime-local llega como string
+    string nombre,
+    string cedula,
+    string placa,
+    string correoContacto,
+    string motivo,
+    int duracionHoras,
+    string finManual,
+    string geoLat,
+    string geoLng,
+    string geoPrecision,
+    string geoFuente
+)
 
-            // ✅ GEOLOCALIZACIÓN (simulada)
-            string geoLat,
-            string geoLng,
-            string geoPrecision,
-            string geoFuente
-        )
         {
             // Validación mínima (simulada)
             if (string.IsNullOrWhiteSpace(nombre) ||

@@ -1,122 +1,199 @@
-﻿@{
-    ViewBag.Title = "Seleccionar parqueadero";
-}
-
-<h2>Seleccionar / Reservar parqueadero</h2>
-
-<div id="geoStatus" style="margin:10px 0; padding:10px; border:1px solid #ccc; border-radius:10px;">
-    Geolocalización: <strong>pendiente</strong>
-</div>
-
-<button type="button" onclick="pedirUbicacion()">📍 Usar mi ubicación (simulada)</button>
-
-<hr />
-
-<div style="position:relative; max-width:900px;">
-    <!-- Imagen real del parqueadero -->
-    <img src="@Url.Content("~/Content/Imagenes/parqueadero.jpg")"
-         alt="Mapa del parqueadero (simulado)"
-         style="width:100%; border-radius:12px; border:1px solid #ccc;" />
-
-    <!-- Overlay: ejemplo de “bloques” (puedes ajustar posiciones) -->
-    <button type="button" class="zona" data-zona="A" style="position:absolute; top:20%; left:15%;">Bloque A</button>
-    <button type="button" class="zona" data-zona="B" style="position:absolute; top:35%; left:55%;">Bloque B</button>
-    <button type="button" class="zona" data-zona="C" style="position:absolute; top:70%; left:30%;">Bloque C</button>
-</div>
-
-<p id="sugerencia" style="margin-top:12px;"></p>
-
-@using (Html.BeginForm("GuardarSeleccion", "Parqueaderos", FormMethod.Post))
-{
-    <input type="hidden" id="espacioId" name="espacioId" />
-
-    <button type="submit" style="margin-top:12px;">
-        Reservar/Confirmar selección
-    </button>
+﻿@{@{
+        ViewBag.Title = "Seleccionar parqueadero";
+        Layout = "~/Views/Shared/_Layout.cshtml"; // si tu layout ya existe
 }
 
 <style>
-    .zona {
+    .page-wrap {
+        max-width: 1050px;
+        margin: 20px auto;
+        padding: 0 16px;
+    }
+
+    .card {
         background: #fff;
-        border: 2px solid #1f6feb;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        margin-bottom: 14px;
+    }
+
+    .muted {
+        color: #555;
+        font-size: 13px;
+    }
+
+    .legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid #ddd;
+        background: #fff;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        display: inline-block;
+        border: 1px solid rgba(0,0,0,.2);
+    }
+
+    /* Cine grid */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .slot {
+        height: 44px;
         border-radius: 10px;
+        border: 2px solid rgba(0,0,0,.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
         cursor: pointer;
+        user-select: none;
+    }
+
+    .libre {
+        background: #bdf5bd;
+    }
+    /* verde */
+    .ocupado {
+        background: #ffb3b3;
+    }
+    /* rojo */
+    .discap {
+        background: #b3d9ff;
+    }
+    /* azul */
+    .cerrado {
+        background: #d9d9d9;
+        cursor: not-allowed;
+    }
+    /* gris */
+
+    .slot:focus-visible {
+        outline: 4px solid #ffbf00;
+        outline-offset: 3px;
+    }
+
+    .msg {
+        margin-top: 10px;
         font-weight: 700;
     }
 
-        .zona:focus {
-            outline: 4px solid #ffbf00;
-            outline-offset: 3px;
-        }
-
-        .zona.sugerida {
-            border-color: #0a0;
-            box-shadow: 0 0 0 4px rgba(0,128,0,.2);
-        }
-</style>
-
-<script>
-    // “Centros” de cada bloque (coordenadas simuladas cerca de tu campus)
-    // Luego tú los ajustas con valores reales aproximados del campus UISEK (o inventados pero consistentes)
-    const bloques = {
-        A: { lat: -0.2000, lng: -78.4900 },
-        B: { lat: -0.2005, lng: -78.4895 },
-        C: { lat: -0.2010, lng: -78.4905 }
-    };
-
-    // Haversine (distancia en metros)
-    function distM(lat1,lng1,lat2,lng2){
-        const R=6371000;
-        const toRad = x => x*Math.PI/180;
-        const dLat = toRad(lat2-lat1);
-        const dLng = toRad(lng2-lng1);
-        const a = Math.sin(dLat/2)**2 +
-                  Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
-        return 2*R*Math.asin(Math.sqrt(a));
+    /* Accesibilidad con modos globales (si ya tienes clases en body) */
+    body.oscuro .card {
+        background: #111;
+        color: #fff;
     }
 
-    function pedirUbicacion(){
-        const status = document.getElementById("geoStatus");
-        status.innerHTML = "Geolocalización: <strong>solicitando permiso...</strong>";
+    body.oscuro .muted {
+        color: #ddd;
+    }
+</style>
 
-        if(!navigator.geolocation){
-            status.innerHTML = "Geolocalización: <strong>no soportada</strong>";
+<div class="page-wrap">
+
+    <div class="card">
+        <h2 style="margin:0;">🅿️ Seleccionar parqueadero</h2>
+        <p class="muted" style="margin-top:6px;">
+            Mapa tipo cine (simulado). Selecciona un espacio disponible.
+        </p>
+
+        <div class="legend" aria-label="Leyenda de estados">
+            <span class="tag"><span class="dot" style="background:#bdf5bd"></span> Disponible</span>
+            <span class="tag"><span class="dot" style="background:#ffb3b3"></span> Ocupado</span>
+            <span class="tag"><span class="dot" style="background:#b3d9ff"></span> Discapacidad</span>
+            <span class="tag"><span class="dot" style="background:#d9d9d9"></span> Cerrado</span>
+        </div>
+    </div>
+
+    <div class="card" role="region" aria-label="Geolocalización simulada">
+        <h3 style="margin:0;">📍 Geolocalización (simulada)</h3>
+        <p class="muted" style="margin-top:6px;">
+            Esto confirma que lo del registro visitante se guardó en sesión.
+        </p>
+
+        <ul style="margin:10px 0 0 18px;">
+            <li><strong>Lat:</strong> @(ViewBag.GeoLat ?? "—")</li>
+            <li><strong>Lng:</strong> @(ViewBag.GeoLng ?? "—")</li>
+            <li><strong>Fuente:</strong> @(ViewBag.GeoFuente ?? "NINGUNA")</li>
+        </ul>
+
+        <p class="msg">✅ Sugerencia: <strong>@ViewBag.BloqueSugerido</strong></p>
+    </div>
+
+    <div class="card" role="region" aria-label="Mapa tipo cine">
+        <h3 style="margin:0;">🎬 Mapa tipo cine (Bloque A - Zona 1)</h3>
+        <p class="muted" style="margin-top:6px;">Haz click o usa TAB + ENTER para seleccionar.</p>
+
+        <div class="grid" id="grid">
+            @for (int i = 1; i <= 40; i++)
+            {
+                // Simulación simple de estados
+                string estado = "libre";
+                if (i % 7 == 0) estado = "ocupado";
+                if (i % 13 == 0) estado = "cerrado";
+                if (i % 11 == 0) estado = "discap";
+
+                string label = "A" + i.ToString("00");
+                <button type="button"
+                        class="slot @estado"
+                        data-label="@label"
+                        aria-label="Espacio @label, estado @estado"
+                        @(estado == "cerrado" ? "disabled" : "")
+                        onclick="selectSlot('@label','@estado')">
+                    @label
+                </button>
+            }
+        </div>
+
+        <div id="seleccion" class="msg" role="status" aria-live="polite" style="margin-top:12px;">
+            Selección: —
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function prettyEstado(e) {
+        if (e === "libre") return "Disponible";
+        if (e === "ocupado") return "Ocupado";
+        if (e === "discap") return "Discapacidad";
+        if (e === "cerrado") return "Cerrado";
+        return e;
+    }
+
+    function selectSlot(label, estado) {
+        if (estado === "cerrado") {
+            document.getElementById("seleccion").textContent =
+                "No disponible: " + label + " está cerrado.";
+            return;
+        }
+        if (estado === "ocupado") {
+            document.getElementById("seleccion").textContent =
+                "No disponible: " + label + " está ocupado.";
             return;
         }
 
-        navigator.geolocation.getCurrentPosition(pos=>{
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            status.innerHTML = `Geolocalización: <strong>OK</strong> (lat ${lat.toFixed(5)}, lng ${lng.toFixed(5)})`;
-
-            // Buscar bloque más cercano
-            let mejor = null;
-            let mejorD = Infinity;
-            for(const k in bloques){
-                const d = distM(lat,lng,bloques[k].lat,bloques[k].lng);
-                if(d < mejorD){ mejorD=d; mejor=k; }
-            }
-
-            // Resaltar sugerido
-            document.querySelectorAll(".zona").forEach(z => z.classList.remove("sugerida"));
-            const btn = document.querySelector(`.zona[data-zona="${mejor}"]`);
-            if(btn) btn.classList.add("sugerida");
-
-            document.getElementById("sugerencia").innerHTML =
-                `🤖 Sugerencia por geolocalización: <strong>Bloque ${mejor}</strong> (aprox. ${Math.round(mejorD)} m).`;
-        }, err=>{
-            status.innerHTML = "Geolocalización: <strong>denegada o falló</strong>. Puedes seleccionar manualmente.";
-        }, { enableHighAccuracy:false, timeout:8000 });
+        document.getElementById("seleccion").textContent =
+            "Selección: " + label + " (" + prettyEstado(estado) + "). ✔️";
     }
-
-    // Selección manual (el usuario “designa” su puesto)
-    document.querySelectorAll(".zona").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-            const zona = btn.getAttribute("data-zona");
-            document.getElementById("espacioId").value = "ZONA_" + zona; // por ahora simple
-            document.getElementById("sugerencia").innerHTML =
-                `✅ Seleccionaste: <strong>Bloque ${zona}</strong>.`;
-        });
-    });
 </script>
