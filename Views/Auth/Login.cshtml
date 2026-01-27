@@ -13,379 +13,560 @@
     <link rel="shortcut icon" href="@Url.Content("~/Content/Imagenes/carro.png")" />
 
     <style>
-        /* ===== BASE ===== */
+        :root {
+            --c-visit: #2aa7b3; /* overlay visitante */
+            --c-inst: #1f6feb; /* overlay institucional */
+            --radius: 18px;
+        }
+
+        /* ===== FONDO ===== */
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            /* Fondo institucional */
-            background: linear-gradient(rgba(246, 247, 251, 0.75), rgba(246, 247, 251, 0.75)), url('/Content/Imagenes/fondo_uisek.png');
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(246,247,251,.75), rgba(246,247,251,.75)), url('/Content/Imagenes/fondo_uisek.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-        /* ===== CONTENEDOR LOGIN ===== */
-        .login-box {
-            max-width: 420px;
-            margin: 80px auto;
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0,0,0,.08);
-        }
-
-        h1 {
-            font-size: 20px;
-            margin: 0 0 8px 0;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-top: 14px;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-            button[type="submit"] {
-                background: #1f6feb;
-                color: white;
-                font-weight: bold;
-                border: none;
-                margin-top: 20px;
-                cursor: pointer;
-            }
-
-        .hint {
-            font-size: 12px;
-            color: #555;
-        }
-
-        .checkbox {
-            margin-top: 12px;
-        }
-
-        /* ===== BARRA ACCESIBILIDAD LOGIN ===== */
-        .a11y-bar {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-
-        .a11y-btn {
-            width: auto;
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background: #fff;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-            .a11y-btn:hover {
-                background: #f2f2f2;
-            }
-
-        /* ===== LINK VISITANTE ACCESIBLE ===== */
-        .visitor-link {
-            margin-top: 14px;
-            padding: 10px;
-            border-radius: 10px;
-            background: #f2f6ff;
-            border: 1px dashed #1f6feb;
-        }
-
-            .visitor-link a {
-                display: block;
-                text-decoration: none;
-                font-weight: 600;
-                color: #1f6feb;
-            }
-
-                .visitor-link a:hover {
-                    text-decoration: underline;
-                }
-
-        /* ===== MENSAJES UNIFICADOS (ERRORES / AVISOS) ===== */
-        .system-message {
-            margin: 12px 0;
-            padding: 12px 14px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 1.5;
-            background: #fff4f4;
-            color: #8b0000;
-            border: 2px solid #c00;
-        }
-
-        /* ===== FOCUS ACCESIBLE ===== */
         :focus-visible {
             outline: 4px solid #ffbf00;
             outline-offset: 3px;
         }
 
+        /* ===== BARRA ACCESIBILIDAD ===== */
+        .a11y-bar {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2000;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+            .a11y-bar button {
+                padding: 8px 12px;
+                border-radius: 999px;
+                border: 1px solid #cfd6e4;
+                background: rgba(255,255,255,.92);
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 800;
+            }
+
+                .a11y-bar button:hover {
+                    background: #f1f5ff;
+                }
+
+        /* ===== CONTENEDOR ===== */
+        .shell {
+            width: 980px;
+            max-width: 95%;
+            height: 540px;
+            background: rgba(255,255,255,0.94);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 45px rgba(0,0,0,.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+        }
+
+        .panel {
+            padding: 46px 42px;
+            z-index: 2;
+        }
+
+        .title {
+            margin: 0 0 8px 0;
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #596277;
+            margin: 0 0 18px 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 12px;
+            margin-top: 7px;
+            border-radius: 10px;
+            border: 1px solid #cfd6e4;
+            box-sizing: border-box;
+            outline: none;
+            background: #fff;
+        }
+
+        .help {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        .checkbox {
+            margin-top: 14px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 18px;
+            border-radius: 12px;
+            border: none;
+            background: #1f6feb;
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-soft {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 12px;
+            background: #eef4ff;
+            border: 1px dashed #1f6feb;
+            color: #1f6feb;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .system-message {
+            margin: 12px 0;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            background: #fff4f4;
+            color: #8b0000;
+            border: 2px solid #c00;
+        }
+
+        /* ===== BOMBITA (FORMA D) ===== */
+        .overlay {
+            position: absolute;
+            top: -70px;
+            bottom: -65px;
+            left: 0;
+            width: 50%;
+            height: auto;
+            background: var(--c-visit);
+            border-top-right-radius: 320px;
+            border-bottom-right-radius: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 999;
+            transition: transform .6s ease, background .6s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* contenido centrado bonito */
+        .overlay-content {
+            max-width: 300px;
+            text-align: center;
+            padding: 24px 34px;
+            box-sizing: border-box;
+        }
+
+        .overlay h2 {
+            margin: 0 0 10px 0;
+            font-size: 38px;
+            font-weight: 900;
+        }
+
+        .overlay p {
+            margin: 0 0 18px 0;
+            font-size: 13px;
+            line-height: 1.5;
+            opacity: .95;
+        }
+
+        .overlay .ghost {
+            background: transparent;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* ===== cuando pasa a institucional ===== */
+        .shell.is-inst .overlay {
+            transform: translateX(100%);
+            background: var(--c-inst);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-top-left-radius: 280px;
+            border-bottom-left-radius: 280px;
+        }
+
+        /* ===== Mini badge ===== */
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            background: #f1f5ff;
+            color: #1f6feb;
+            border: 1px solid #d7e2ff;
+            margin-bottom: 10px;
+        }
+
+        /* ===== Validación visual correo ===== */
+        .ok {
+            border-color: #18a34a !important;
+        }
+
+        .bad {
+            border-color: #dc2626 !important;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 900px) {
+            .shell {
+                height: auto;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .overlay {
+                width: 100%;
+                height: 180px;
+                position: relative;
+                transform: none !important;
+                border-radius: 0 0 260px 260px;
+                top: 0;
+                bottom: auto;
+            }
+        }
+
         /* ===== MODO DISLEXIA ===== */
         body.dislexia {
-            letter-spacing: 0.04em;
-            line-height: 1.6;
+            letter-spacing: 0.05em;
+            line-height: 1.7;
         }
 
         /* ===== MODO OSCURO ===== */
         body.oscuro {
-            background: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.85)), url('/Content/Imagenes/fondo_uisek.png');
+            background: linear-gradient(rgba(10,15,30,.9), rgba(10,15,30,.9)), url('/Content/Imagenes/fondo_uisek.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-            body.oscuro .login-box {
-                background: #111827;
+            body.oscuro .shell {
+                background: rgba(17,24,39,.92);
                 color: #fff;
-                border: 1px solid #2b3447;
+            }
+
+            body.oscuro .hint,
+            body.oscuro .help {
+                color: #cbd5e1;
             }
 
             body.oscuro input,
             body.oscuro select {
-                background: #0b0f19;
+                background: #0b1220;
                 color: #fff;
-                border-color: #2b3447;
+                border-color: #334155;
             }
 
-            body.oscuro .hint {
-                color: #cbd5e1;
+            body.oscuro .badge {
+                background: #0b1220;
+                color: #9bb4ff;
+                border-color: #334155;
             }
 
-            body.oscuro .a11y-btn {
-                background: #0b0f19;
-                color: #fff;
-                border-color: #2b3447;
-            }
-
-            body.oscuro .visitor-link {
-                background: #0b0f19;
+            body.oscuro .btn-soft {
+                background: #0b1220;
                 border-color: #4f7cff;
+                color: #9bb4ff;
             }
 
-                body.oscuro .visitor-link a {
-                    color: #9bb4ff;
-                }
-
-            body.oscuro .system-message {
-                background: #2a0f0f;
-                color: #ffb3b3;
-                border-color: #ff6b6b;
+            body.oscuro .a11y-bar button {
+                background: rgba(11,15,25,.8);
+                color: #fff;
+                border-color: #334155;
             }
 
         /* ===== ALTO CONTRASTE ===== */
         body.contraste {
-            background: #ffffff !important;
-            color: #000000 !important;
+            background: #fff !important;
+            color: #000 !important;
         }
 
-            body.contraste .login-box {
-                background: #ffffff !important;
-                border: 3px solid #000000;
+            body.contraste .shell {
+                background: #fff !important;
+                border: 3px solid #000;
                 box-shadow: none;
-                color: #000 !important;
             }
 
             body.contraste input,
             body.contraste select,
             body.contraste button {
-                border: 2px solid #000000 !important;
+                border: 2px solid #000 !important;
             }
 
-                body.contraste button[type="submit"] {
-                    background: #000000 !important;
-                    color: #ffffff !important;
-                }
+            body.contraste .btn {
+                background: #000 !important;
+                color: #fff !important;
+            }
 
-            body.contraste .hint {
+            body.contraste .btn-soft {
+                background: #fff !important;
                 color: #000 !important;
+                border: 2px solid #000 !important;
             }
 
-            body.contraste .a11y-btn {
-                background: #fff;
-                color: #000;
-                border: 2px solid #000;
+            body.contraste .badge {
+                background: #fff !important;
+                color: #000 !important;
+                border: 2px solid #000 !important;
             }
 
-            body.contraste .visitor-link {
-                background: #fff;
-                border: 2px solid #000;
+            body.contraste .a11y-bar button {
+                background: #fff !important;
+                color: #000 !important;
+                border: 2px solid #000 !important;
             }
-
-                body.contraste .visitor-link a {
-                    color: #000;
-                }
-
-            body.contraste .system-message {
-                background: #ffffff;
-                color: #000000;
-                border: 3px solid #000000;
-            }
-
-        /* Espacio debajo de inputs/selects para que no choque con el help */
-        input, select {
-            margin-bottom: 8px;
-        }
-
-        /* Help text con margen arriba (por si acaso) */
-        #correoHelp {
-            margin-top: 4px;
-        }
-
     </style>
 </head>
 
 <body>
-    <main class="login-box" aria-labelledby="tituloLogin">
+    <!-- ===== BARRA ACCESIBILIDAD ===== -->
+    <div class="a11y-bar" role="region" aria-label="Accesibilidad">
+        <button type="button" onclick="setTheme('claro')">☀️ Claro</button>
+        <button type="button" onclick="setTheme('oscuro')">🌙 Oscuro</button>
+        <button type="button" onclick="toggleClass('contraste')">🌓 Contraste</button>
+        <button type="button" onclick="toggleClass('dislexia')">📖 Dislexia</button>
+    </div>
 
-        <div class="a11y-bar" role="region" aria-label="Accesibilidad">
-            <button type="button" class="a11y-btn" onclick="setTheme('claro')">☀️ Claro</button>
-            <button type="button" class="a11y-btn" onclick="setTheme('oscuro')">🌙 Oscuro</button>
-            <button type="button" class="a11y-btn" onclick="toggleClass('contraste')">🌓 Contraste</button>
-            <button type="button" class="a11y-btn" onclick="toggleClass('dislexia')">📖 Dislexia</button>
+    <main class="shell" id="shell" aria-label="Acceso UISEK Parqueaderos">
+
+        <!-- OVERLAY CLICKABLE -->
+        <section class="overlay" id="overlay" tabindex="0" role="button"
+                 aria-label="Cambiar entre Visitante e Institucional">
+            <div class="overlay-content">
+                <h2 id="ovTitle">Institucional</h2>
+                <p id="ovText">Ingresa con tu correo @@uisekp.edu.ec y selecciona tu rol.</p>
+                <button type="button" class="ghost" id="ovBtn">Ir a Institucional</button>
+            </div>
+        </section>
+
+        <div class="grid">
+
+            <!-- ===== PANEL IZQUIERDO: VISITANTE ===== -->
+            <section class="panel" aria-labelledby="tVisit">
+                <span class="badge">🚶 Registro Temporal</span>
+                <h1 class="title" id="tVisit">Visita / Invitado</h1>
+                <p class="hint">
+                    Para personas sin correo institucional. Se registra solo para permitir el ingreso y control del parqueadero.
+                </p>
+
+                <div style="margin-top:10px;">
+                    <label>¿No tienes correo @@uisekp.edu.ec?</label>
+                    <div class="help">
+                        Usa el registro temporal (rápido). Luego el guardia o recepción valida tu ingreso.
+                    </div>
+
+                    <button class="btn-soft" type="button"
+                            onclick="location.href='@Url.Action("RegistroVisitante","Auth")'">
+                        🧾 Registrar visita (temporal)
+                    </button>
+
+                    <div class="help" style="margin-top:10px;">
+                        Sugerencia: aquí puedes explicar “placa, motivo de visita, tiempo estimado”, etc.
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PANEL DERECHO: INSTITUCIONAL (LOGIN REAL) ===== -->
+            <section class="panel" aria-labelledby="tInst">
+                <span class="badge">🏫 Acceso Institucional</span>
+                <h1 class="title" id="tInst">Ingreso al Sistema</h1>
+                <p class="hint">Acceso simulado con roles y enfoque en accesibilidad.</p>
+
+                @if (ViewBag.ErrorLogin != null)
+                {
+                    <div class="system-message" role="alert">
+                        @ViewBag.ErrorLogin
+                    </div>
+                }
+
+                @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { autocomplete = "on" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <label for="correo">Correo institucional</label>
+                    <input id="correo" name="correo" type="email" required
+                           placeholder="nombre@uisekp.edu.ec"
+                           autocomplete="email"
+                           aria-describedby="correoHelp" />
+
+                    <div id="correoHelp" class="help">
+                        Debe terminar en <b>@@uisekp.edu.ec</b> (simulado).
+                    </div>
+
+                    <label for="rol">Rol</label>
+                    <select id="rol" name="rol" required>
+                        <option value="">Seleccione su rol</option>
+                        <option value="ESTUDIANTE">Estudiante</option>
+                        <option value="DOCENTE">Docente</option>
+                        <option value="ADMINISTRATIVO">Administrativo</option>
+                        <option value="GUARDIA">Guardia</option>
+                    </select>
+
+                    <div class="checkbox">
+                        <label for="tieneDiscapacidad">
+                            <input id="tieneDiscapacidad" type="checkbox"
+                                   name="tieneDiscapacidad" value="true" />
+                            ♿ Tengo discapacidad (simulado)
+                        </label>
+                    </div>
+
+                    <button class="btn" type="submit">Ingresar al sistema</button>
+                }
+
+                <p class="help" style="margin-top:12px;">
+                    Navegación por teclado (TAB / ESPACIO / ENTER).
+                </p>
+            </section>
+
         </div>
-
-        <h1 id="tituloLogin">UISEK Control de Parqueaderos</h1>
-        <p class="hint">Acceso simulado con enfoque en accesibilidad.</p>
-
-        @if (ViewBag.ErrorLogin != null)
-        {
-            <div class="system-message" role="alert">
-                @ViewBag.ErrorLogin
-            </div>
-        }
-
-        @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { autocomplete = "on" }))
-        {
-            @Html.AntiForgeryToken()
-
-            <!-- CORREO -->
-            <label for="correo">Correo institucional</label>
-            <input id="correo"
-                   name="correo"
-                   type="email"
-                   required
-                   tabindex="1"
-                   autofocus
-                   autocomplete="email"
-                   placeholder="nombre@uisekp.edu.ec"
-                   aria-describedby="correoHelp" />
-
-            <div id="correoHelp" class="hint help-text">
-                Ejemplo: nombre@uisekp.edu.ec
-            </div>
-
-            <!-- ROL -->
-            <label for="rol">Rol</label>
-            <select id="rol" name="rol" required tabindex="2">
-                <option value="">Seleccione su rol</option>
-                <option value="ESTUDIANTE">Estudiante</option>
-                <option value="DOCENTE">Docente</option>
-                <option value="ADMINISTRATIVO">Administrativo</option>
-                <option value="GUARDIA">Guardia</option>
-            </select>
-
-            <!-- DISCAPACIDAD TRANSVERSAL -->
-            <div class="checkbox">
-                <label for="tieneDiscapacidad">
-                    <input id="tieneDiscapacidad"
-                           type="checkbox"
-                           name="tieneDiscapacidad"
-                           value="true"
-                           tabindex="3" />
-                    ♿ Tengo discapacidad (simulado)
-                </label>
-            </div>
-
-            <button type="submit" tabindex="4">Ingresar al sistema</button>
-
-            <div class="visitor-link">
-                <a href="@Url.Action("RegistroVisitante", "Auth")"
-                   tabindex="5"
-                   aria-label="Registro temporal para visitantes sin correo institucional">
-                    🚶 Soy visitante (registro temporal)
-                </a>
-            </div>
-        }
-
-        <p class="hint" role="note">
-            Navegación completa mediante teclado (TAB / ESPACIO / ENTER).
-        </p>
     </main>
 
     <script>
-        (function () {
-            var theme = localStorage.getItem("uiseK_theme") || "claro";
+        const shell   = document.getElementById("shell");
+        const overlay = document.getElementById("overlay");
+        const ovTitle = document.getElementById("ovTitle");
+        const ovText  = document.getElementById("ovText");
+        const ovBtn   = document.getElementById("ovBtn");
+        const correo  = document.getElementById("correo");
 
-            // Tema
-            if (theme === "oscuro") {
-                document.body.classList.add("oscuro");
+        /*
+          CTA (Call To Action) al revés (como tú querías):
+          - Si estás en INSTITUCIONAL -> la bombita invita a VISITANTE
+          - Si estás en VISITANTE     -> la bombita invita a INSTITUCIONAL
+        */
+        function updateOverlayCTA(isInstitucional) {
+            if (isInstitucional) {
+                // CTA: ir a Visitante
+                ovTitle.innerText = "Visitante";
+                ovText.innerText  = "¿No tienes correo institucional? Regístrate temporalmente.";
+                ovBtn.innerText   = "Ir a Visitante";
+            } else {
+                // CTA: ir a Institucional
+                ovTitle.innerText = "Institucional";
+                ovText.innerText  = "Ingresa con tu correo @@uisekp.edu.ec y selecciona tu rol.";
+                ovBtn.innerText   = "Ir a Institucional";
+            }
+        }
+
+        function toggleMode() {
+            const isInst = !shell.classList.contains("is-inst");
+            shell.classList.toggle("is-inst", isInst);
+            updateOverlayCTA(isInst);
+        }
+
+        overlay.addEventListener("click", toggleMode);
+
+        ovBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMode();
+        });
+
+        overlay.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleMode();
+            }
+        });
+
+        // Validación visual simple del correo institucional
+        if (correo) {
+            correo.addEventListener("input", function () {
+                const v = (correo.value || "").trim().toLowerCase();
+                correo.classList.remove("ok", "bad");
+                if (!v) return;
+                if (v.endsWith("@@uisekp.edu.ec")) correo.classList.add("ok");
+                else correo.classList.add("bad");
+            });
+        }
+
+        // ===== Accesibilidad: cargar preferencias =====
+        (function () {
+            const theme = localStorage.getItem("u_theme") || "claro";
+            if (theme === "oscuro") document.body.classList.add("oscuro");
+
+            if (localStorage.getItem("u_contraste") === "1") {
+                document.body.classList.add("contraste");
+                document.body.classList.remove("oscuro");
+                localStorage.setItem("u_theme", "claro");
             }
 
-            // Dislexia
-            if (localStorage.getItem("uiseK_dislexia") === "1") {
+            if (localStorage.getItem("u_dislexia") === "1") {
                 document.body.classList.add("dislexia");
             }
 
-            // Contraste manda sobre todo
-            if (localStorage.getItem("uiseK_contraste") === "1") {
-                document.body.classList.add("contraste");
-                document.body.classList.remove("oscuro");
-                localStorage.setItem("uiseK_theme", "claro");
-            }
+            // Inicializa CTA (arranca VISITANTE porque no tiene is-inst)
+            updateOverlayCTA(shell.classList.contains("is-inst"));
         })();
 
         function setTheme(mode) {
-            // Si el usuario elige tema, apaga contraste
-            document.body.classList.remove("contraste");
-            localStorage.setItem("uiseK_contraste", "0");
+            document.body.classList.remove("oscuro", "contraste");
+            localStorage.setItem("u_contraste", "0");
 
-            localStorage.setItem("uiseK_theme", mode);
-
-            document.body.classList.remove("oscuro");
             if (mode === "oscuro") {
                 document.body.classList.add("oscuro");
+                localStorage.setItem("u_theme", "oscuro");
+            } else {
+                localStorage.setItem("u_theme", "claro");
             }
         }
 
         function toggleClass(cls) {
             if (cls === "contraste") {
-                var activo = document.body.classList.toggle("contraste");
-
-                if (activo) {
-                    // Guarda tema previo y apaga oscuro
-                    var themeActual = document.body.classList.contains("oscuro") ? "oscuro" : "claro";
-                    localStorage.setItem("uiseK_prevTheme", themeActual);
-
+                const active = document.body.classList.toggle("contraste");
+                if (active) {
                     document.body.classList.remove("oscuro");
-                    localStorage.setItem("uiseK_theme", "claro");
-                } else {
-                    // Restaura tema previo
-                    var prev = localStorage.getItem("uiseK_prevTheme") || "claro";
-                    setTheme(prev);
+                    localStorage.setItem("u_theme", "claro");
                 }
-
-                localStorage.setItem("uiseK_contraste", activo ? "1" : "0");
+                localStorage.setItem("u_contraste", active ? "1" : "0");
                 return;
             }
 
-            // Dislexia
             document.body.classList.toggle(cls);
-            localStorage.setItem("uiseK_" + cls, document.body.classList.contains(cls) ? "1" : "0");
+            localStorage.setItem("u_" + cls, document.body.classList.contains(cls) ? "1" : "0");
         }
     </script>
 </body>
