@@ -1,10 +1,8 @@
 ﻿@{
     var correo = (string)Session["Correo"];
-    var rol = (string)Session["Rol"];
+    var rol = ((string)Session["Rol"] ?? "").ToUpper();
     var nombreSistema = "UISEK Parqueadero Inteligente";
-}
 
-@{
     var dislexia = (Session["ModoDislexia"] as bool?) ?? false;
     var oscuro = (Session["ModoOscuro"] as bool?) ?? false;
     var contraste = (Session["AltoContraste"] as bool?) ?? false;
@@ -13,112 +11,357 @@
     if (dislexia) { bodyClass += " dislexia"; }
     if (oscuro) { bodyClass += " oscuro"; }
     if (contraste) { bodyClass += " contraste"; }
+
+    var currentController = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+    var currentAction = (ViewContext.RouteData.Values["action"] ?? "").ToString();
 }
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="@Url.Content("~/Content/Imagenes/carro.png")" />
-    <link rel="shortcut icon" href="@Url.Content("~/Content/Imagenes/carro.png")" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title - @nombreSistema</title>
+
+    <link rel="icon" href="@Url.Content("~/Content/Imagenes/carro.png")" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f6f7fb;
+        :root {
+            --bg: #ffffff;
+            --text: #32363B;
+            --title: #053D4E;
+            --border: #E6E9ED;
+            --hover: #F7F9FA;
+            --selected: #EBF0FF;
+            --primary: #355CC0;
         }
 
-        .topbar {
-            background: #111;
-            color: #fff;
-            padding: 12px 16px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Nunito Sans",sans-serif
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text)
+        }
+
+        /* ===== HEADER LIMPIO ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 78px;
+            z-index: 200;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .badge {
-            background: #1f6feb;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-        }
-
-        .container {
-            display: flex;
-            min-height: calc(100vh - 48px);
-        }
-
-        aside {
-            width: 260px;
+            padding: 0 1.8rem;
             background: #fff;
-            border-right: 1px solid #e6e6e6;
-            padding: 14px;
+            border-bottom: 1px solid var(--border);
         }
 
-        main {
-            flex: 1;
-            padding: 18px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .menu a {
-            display: block;
-            padding: 10px 12px;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #111;
-            margin-bottom: 6px;
-        }
-
-            .menu a:hover {
-                background: #eef3ff;
+            .brand img {
+                width: 75px;
+                height: 75px;
+                object-fit: contain;
             }
 
-        .card {
+            .brand span {
+                font-size: 1.35rem;
+                font-weight: 900;
+                color: var(--title);
+                white-space: nowrap;
+            }
+
+        .right {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .icons-header {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+            .icons-header:hover {
+                background: var(--hover);
+                transform: translateY(-2px);
+            }
+
+        /* ===== ACCESIBILIDAD (HOVER + DELAY) ===== */
+        .acc-dd {
+            position: relative
+        }
+
+        .acc-panel {
+            position: absolute;
+            top: 52px;
+            right: 0;
             background: #fff;
-            padding: 16px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: .65rem;
+            box-shadow: 0 12px 30px rgba(0,0,0,.12);
+            display: none;
+            flex-direction: column;
+            gap: .35rem;
+            min-width: 170px;
         }
 
-        .muted {
-            color: #555;
-            font-size: 13px;
+        .acc-dd.open .acc-panel {
+            display: flex
         }
 
-        /* Accesibilidad: foco visible */
-        a:focus, button:focus {
-            outline: 3px solid #111;
-            outline-offset: 2px;
+        .acc-title {
+            font-size: 12px;
+            opacity: .7;
+            margin: .1rem .4rem .3rem;
         }
 
+        .acc-item {
+            padding: .5rem .6rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            transition: .2s;
+        }
 
+            .acc-item:hover {
+                background: var(--hover);
+                transform: translateX(2px);
+            }
+
+            .acc-item.on {
+                background: var(--selected);
+                color: var(--primary);
+                font-weight: 700;
+            }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 78px;
+            left: 0;
+            width: 60px;
+            height: calc(100vh - 78px);
+            border-right: 1px solid var(--border);
+            background: #fff;
+            transition: .4s;
+            overflow: hidden;
+        }
+
+            .sidebar:hover {
+                width: 260px
+            }
+
+            .sidebar a {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: .8rem;
+                margin: .4rem;
+                border-radius: 12px;
+                text-decoration: none;
+                color: inherit;
+                white-space: nowrap;
+            }
+
+                .sidebar a:hover {
+                    background: var(--hover)
+                }
+
+            /* ===== ARREGLO: ICONO GRANDE SIN AGRANDAR TEXTO ===== */
+
+            .sidebar a {
+                font-size: 14px; /* texto normal */
+                line-height: 1.1;
+            }
+
+            .sidebar .sb-icon {
+                font-size: 24px; /* tamaño del emoji */
+                width: 34px; /* caja fija del icono */
+                height: 34px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .sidebar .sb-text {
+                font-size: 14px; /* texto NO se agranda */
+            }
+
+        /* ===== MAIN ===== */
+        main {
+            margin-top: 78px;
+            margin-left: 60px;
+            padding: 1.6rem;
+            transition: .4s;
+        }
+
+        .sidebar:hover ~ main {
+            margin-left: 260px
+        }
+
+        /* ===== MODOS ===== */
+        body.dislexia {
+            letter-spacing: .4px;
+            line-height: 1.6
+        }
+
+        body.oscuro {
+            --bg: #0b0f19;
+            --text: #e8e8e8;
+            --border: rgba(255,255,255,.15);
+            --hover: rgba(255,255,255,.08);
+            --selected: rgba(31,111,235,.25);
+        }
+
+        body.contraste {
+            --bg: #fff;
+            --text: #000;
+            --border: #000;
+            --hover: #ffcc00;
+            --selected: #ffcc00;
+        }
+
+        @@media (max-width:700px) {
+            .sidebar {
+                width: 0
+            }
+
+            main {
+                margin-left: 0
+            }
+        }
     </style>
 </head>
-<body>
-    <header class="topbar">
-        <div>
-            <strong>@nombreSistema</strong>
-            <span class="badge">Sistema: ACTIVO</span>
+
+<body class="@bodyClass">
+
+    <header>
+        <div class="brand">
+            <img src="@Url.Content("~/Content/Imagenes/logo_uisek.jpg")" alt="UISEK" />
+            <span>UISEK Parqueadero Inteligente</span>
         </div>
-        <div>
-            <span class="muted" style="color:#ddd;">
-                @((correo ?? "Invitado")) | Rol: @((rol ?? "N/A"))
-            </span>
+
+        <div class="right">
+            <div class="icons-header">💬</div>
+            <div class="icons-header">❓</div>
+            <div class="icons-header">🔔</div>
+
+            <!-- Accesibilidad (igual que antes) -->
+            <div class="acc-dd" id="accDD">
+                <div class="icons-header">♿</div>
+                <div class="acc-panel">
+                    <div class="acc-title">Accesibilidad</div>
+                    <a class="acc-item @(dislexia?"on":"")" href="@Url.Action("Dislexia","Accesibilidad")">📖 Dislexia</a>
+                    <a class="acc-item @(oscuro?"on":"")" href="@Url.Action("Oscuro","Accesibilidad")">🌙 Oscuro</a>
+                    <a class="acc-item @(contraste?"on":"")" href="@Url.Action("Contraste","Accesibilidad")">🌓 Contraste</a>
+                </div>
+            </div>
         </div>
     </header>
 
-    <div class="container">
-        <aside>
-            @Html.Partial("_Menu")
-            <hr />
-            @Html.Partial("_AccessibilityBar")
-        </aside>
+    <div class="sidebar">
 
-        <main>
-            @RenderBody()
-        </main>
+        @* ===== Link principal según rol ===== *@
+        @if (!string.IsNullOrWhiteSpace(rol))
+        {
+            if (rol == "ESTUDIANTE")
+            {
+                <a href="@Url.Action("Index","Estudiante")" class="@(currentController=="Estudiante" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Panel Estudiante</span>
+                </a>
+            }
+            else if (rol == "DOCENTE")
+            {
+                <a href="@Url.Action("Index","Docente")" class="@(currentController=="Docente" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Panel Docente</span>
+                </a>
+            }
+            else if (rol == "GUARDIA")
+            {
+                <a href="@Url.Action("Index","Guardia")" class="@(currentController=="Guardia" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Panel Guardia</span>
+                </a>
+            }
+            else if (rol == "ADMINISTRATIVO")
+            {
+                <a href="@Url.Action("Index","Administrativo")" class="@(currentController=="Administrativo" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Panel Administrativo</span>
+                </a>
+            }
+            else if (rol == "VISITANTE")
+            {
+                <a href="@Url.Action("Seleccionar","Parqueaderos")" class="@(currentController=="Parqueaderos" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Seleccionar</span>
+                </a>
+            }
+        }
+
+        @* ===== Salir ===== *@
+        <a href="@Url.Action("Logout","Auth")">
+            <span class="sb-icon">🚪</span>
+            <span class="sb-text">Salir</span>
+        </a>
+
     </div>
+
+
+
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <script>
+        (function () {
+            var accDD = document.getElementById("accDD");
+            var closeTimer = null;
+
+            function openAcc() {
+                if (closeTimer) clearTimeout(closeTimer);
+                accDD.classList.add("open");
+            }
+            function closeAcc() {
+                if (closeTimer) clearTimeout(closeTimer);
+                closeTimer = setTimeout(function () {
+                    accDD.classList.remove("open");
+                }, 700);
+            }
+
+            accDD.addEventListener("mouseenter", openAcc);
+            accDD.addEventListener("mouseleave", closeAcc);
+        })();
+    </script>
+
 </body>
 </html>
+

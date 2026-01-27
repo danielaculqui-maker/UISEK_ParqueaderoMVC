@@ -1,42 +1,54 @@
 ﻿@{
     var rol = ((string)Session["Rol"] ?? "").ToUpper();
-    var correo = (string)Session["Correo"];
+    var correo = Session["Correo"] as string;
 }
 
-<nav class="menu">
-    @* Si NO ha iniciado sesión *@
-    @if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(rol))
-    {
-        <a href="@Url.Action("Login", "Auth")">🔐 Iniciar sesión</a>
-        <a href="@Url.Action("RegistroVisitante", "Auth")">🧑‍🦰 Registro visitante</a>
-    }
-    else
-    {
-        @* Menú por rol *@
-        if (rol == "ESTUDIANTE")
+<nav class="menu tiktok-nav">
+    <ul class="navlist">
+        @if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(rol))
         {
-            <a href="@Url.Action("Index", "Estudiante")">🎓 Panel Estudiante</a>
+            <li>
+                <a href="@Url.Action("Login","Auth")">
+                    <span class="dot">•</span><span class="ico">🔐</span> Login
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("RegistroVisitante","Auth")">
+                    <span class="dot">•</span><span class="ico">🧑‍🦰</span> Registro visitante
+                </a>
+            </li>
         }
-        else if (rol == "DOCENTE")
+        else
         {
-            <a href="@Url.Action("Index", "Docente")">👩‍🏫 Panel Docente</a>
-        }
-        else if (rol == "GUARDIA")
-        {
-            <a href="@Url.Action("Index", "Guardia")">🛡️ Panel Guardia</a>
-        }
-        else if (rol == "ADMINISTRATIVO")
-        {
-            <a href="@Url.Action("Index", "Administrativo")">🧾 Panel Administrativo</a>
-            <a href="@Url.Action("Usuarios", "Administrativo")">👥 Usuarios</a>
-            <a href="@Url.Action("Reportes", "Administrativo")">📊 Reportes</a>
-        }
-        else if (rol == "VISITANTE")
-        {
-            <a href="@Url.Action("Seleccionar", "Parqueaderos")">🅿️ Seleccionar parqueadero</a>
-        }
+            if (rol == "ESTUDIANTE")
+            {
+                <li><a href="@Url.Action("Index","Estudiante")"><span class="dot">•</span><span class="ico">🎓</span> Panel Estudiante</a></li>
+            }
+            else if (rol == "DOCENTE")
+            {
+                <li><a href="@Url.Action("Index","Docente")"><span class="dot">•</span><span class="ico">👩‍🏫</span> Panel Docente</a></li>
+            }
+            else if (rol == "GUARDIA")
+            {
+                <li><a href="@Url.Action("Index","Guardia")"><span class="dot">•</span><span class="ico">🛡️</span> Panel Guardia</a></li>
+            }
+            else if (rol == "ADMINISTRATIVO")
+            {
+                <li><a href="@Url.Action("Index","Administrativo")"><span class="dot">•</span><span class="ico">🧾</span> Panel Administrativo</a></li>
+                <li><a href="@Url.Action("Usuarios","Administrativo")"><span class="dot">•</span><span class="ico">👥</span> Usuarios</a></li>
+                <li><a href="@Url.Action("Reportes","Administrativo")"><span class="dot">•</span><span class="ico">📊</span> Reportes</a></li>
+            }
+            else if (rol == "VISITANTE")
+            {
+                <li><a href="@Url.Action("Seleccionar","Parqueaderos")"><span class="dot">•</span><span class="ico">🅿️</span> Seleccionar</a></li>
+            }
 
-        <hr />
-        <a href="@Url.Action("Logout", "Auth")">🚪 Cerrar sesión</a>
-    }
+            <li class="sep"></li>
+            <li>
+                <a href="@Url.Action("Logout","Auth")">
+                    <span class="dot">•</span><span class="ico">🚪</span> Cerrar sesión
+                </a>
+            </li>
+        }
+    </ul>
 </nav>

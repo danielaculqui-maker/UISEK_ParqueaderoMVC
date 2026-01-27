@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Panel Docente";
+
+    var correo = Session["Correo"] as string;
+    var rol = Session["Rol"] as string;
+
+    var discapacidad = false;
+    if (Session["TieneDiscapacidad"] != null)
+    {
+        bool.TryParse(Session["TieneDiscapacidad"].ToString(), out discapacidad);
+    }
+}
+
+<div class="card">
+    <h2>👩‍🏫 Panel Docente</h2>
+    <p class="muted">Correo: <strong>@(correo ?? "N/A")</strong></p>
+    <p class="muted">Rol: <strong>@(rol ?? "N/A")</strong></p>
+    <p class="muted">Discapacidad: <strong>@(discapacidad ? "Sí" : "No")</strong></p>
+</div>

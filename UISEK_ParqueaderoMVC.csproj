@@ -174,12 +174,12 @@
     <Content Include="Views\Shared\_AccessibilityBar.cshtml" />
     <Content Include="Views\Auth\RegistroVisitante.cshtml" />
     <Content Include="Views\Estudiante\Index.cshtml" />
-    <Content Include="Views\Docente\Docente.cshtml" />
     <Content Include="Views\Administrativo\Index.cshtml" />
     <Content Include="Views\Guardia\Index.cshtml" />
     <Content Include="Views\Shared\_Menu.cshtml" />
-    <Content Include="Views\Administrativo\Usuario.cshtml" />
+    <Content Include="Views\Administrativo\Usuarios.cshtml" />
     <Content Include="Views\Administrativo\Reportes.cshtml" />
+    <Content Include="Views\Docente\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

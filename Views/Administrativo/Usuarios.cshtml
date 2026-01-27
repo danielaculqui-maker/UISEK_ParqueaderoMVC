@@ -1,11 +1,12 @@
-﻿@{@model List<UISEK_ParqueaderoMVC.Models.UsuarioRow>
+﻿@model List<UISEK_ParqueaderoMVC.Models.UsuarioRow>
 @{
     ViewBag.Title = "Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="card">
-    <h2>👥 Usuarios del sistema</h2>
-    <p class="muted">Mostrando @Model.Count usuario(s) registrados.</p>
+    <h2>👥 Usuarios</h2>
+    <p class="muted">Total: <strong>@Model.Count</strong></p>
 
     <table style="width:100%; border-collapse:collapse; margin-top:12px;">
         <thead>
@@ -14,9 +15,6 @@
                 <th style="padding:10px;">Correo</th>
                 <th style="padding:10px;">Rol</th>
                 <th style="padding:10px;">Discapacidad</th>
-                <th style="padding:10px;">Vehículos</th>
-                <th style="padding:10px;">Activo</th>
-                <th style="padding:10px;">Fecha</th>
             </tr>
         </thead>
         <tbody>
@@ -27,9 +25,6 @@
                     <td style="padding:10px;">@u.Correo</td>
                     <td style="padding:10px;">@u.Rol</td>
                     <td style="padding:10px;">@(u.TieneDiscapacidad ? "Sí" : "No")</td>
-                    <td style="padding:10px;">@u.Vehiculos</td>
-                    <td style="padding:10px;">@(u.Activo ? "Sí" : "No")</td>
-                    <td style="padding:10px;">@u.FechaRegistro</td>
                 </tr>
             }
         </tbody>

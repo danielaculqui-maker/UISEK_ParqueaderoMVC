@@ -1,91 +1,46 @@
-﻿@*
-    Barra de Accesibilidad
-    Proyecto: UISEK Parqueadero Inteligente
-    Tipo: Partial View (sin Layout)
-*@
+﻿@{
+    var dislexia = (Session["ModoDislexia"] as bool?) ?? false;
+    var oscuro = (Session["ModoOscuro"] as bool?) ?? false;
+    var contraste = (Session["AltoContraste"] as bool?) ?? false;
+}
 
-<div class="card" style="margin-top:12px;">
-    <strong>Accesibilidad</strong>
-    <p class="muted">Preferencias visuales guardadas por sesión.</p>
-
+<div class="acc-mini">
     <button type="button"
+            class="acc-btn @(dislexia ? "on" : "")"
             onclick="togglePref('ToggleDislexia')"
-            aria-pressed="false">
-        📖 Modo Dislexia
+            aria-pressed="@(dislexia ? "true" : "false")"
+            title="Modo Dislexia">
+        📖
     </button>
 
     <button type="button"
+            class="acc-btn @(oscuro ? "on" : "")"
             onclick="togglePref('ToggleOscuro')"
-            style="margin-top:8px;"
-            aria-pressed="false">
-        🌙 Modo Oscuro
+            aria-pressed="@(oscuro ? "true" : "false")"
+            title="Modo Oscuro">
+        🌙
     </button>
 
     <button type="button"
+            class="acc-btn @(contraste ? "on" : "")"
             onclick="togglePref('ToggleAltoContraste')"
-            style="margin-top:8px;"
-            aria-pressed="false">
-        🌓 Alto Contraste
+            aria-pressed="@(contraste ? "true" : "false")"
+            title="Alto Contraste">
+        🌓
     </button>
-
-    <script>
-        function togglePref(actionName) {
-            fetch('/Accesibilidad/' + actionName, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                }
-            }).then(function () {
-                location.reload();
-            });
-        }
-    </script>
-
-    <style>
-        /* ===== MODO DISLEXIA ===== */
-        body.dislexia {
-            letter-spacing: 0.04em;
-            line-height: 1.6;
-        }
-
-        /* ===== MODO OSCURO ===== */
-        body.oscuro {
-            background: #0b0f19;
-            color: #ffffff;
-        }
-
-            body.oscuro .topbar {
-                background: #000000;
-            }
-
-            body.oscuro aside,
-            body.oscuro .card {
-                background: #111111;
-                color: #ffffff;
-                border-color: #333333;
-            }
-
-            body.oscuro .menu a {
-                color: #ffffff;
-            }
-
-                body.oscuro .menu a:hover {
-                    background: #1a2338;
-                }
-
-        /* ===== ALTO CONTRASTE (BAJA VISIÓN) ===== */
-        body.contraste {
-            background: #ffffff;
-            color: #000000;
-        }
-
-            body.contraste .topbar {
-                background: #000000;
-                color: #ffffff;
-            }
-
-            body.contraste .menu a {
-                border: 2px solid #000000;
-            }
-    </style>
 </div>
+
+<script>
+   function togglePref(actionName) {
+    const urlMap = {
+      "ToggleDislexia": "@Url.Action("ToggleDislexia","Accesibilidad")",
+      "ToggleOscuro": "@Url.Action("ToggleOscuro","Accesibilidad")",
+      "ToggleAltoContraste": "@Url.Action("ToggleAltoContraste","Accesibilidad")"
+    };
+
+    fetch(urlMap[actionName], {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" }
+    }).then(() => location.reload());
+  }
+</script>
