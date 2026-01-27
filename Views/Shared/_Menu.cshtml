@@ -1,0 +1,42 @@
+﻿@{
+    var rol = ((string)Session["Rol"] ?? "").ToUpper();
+    var correo = (string)Session["Correo"];
+}
+
+<nav class="menu">
+    @* Si NO ha iniciado sesión *@
+    @if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(rol))
+    {
+        <a href="@Url.Action("Login", "Auth")">🔐 Iniciar sesión</a>
+        <a href="@Url.Action("RegistroVisitante", "Auth")">🧑‍🦰 Registro visitante</a>
+    }
+    else
+    {
+        @* Menú por rol *@
+        if (rol == "ESTUDIANTE")
+        {
+            <a href="@Url.Action("Index", "Estudiante")">🎓 Panel Estudiante</a>
+        }
+        else if (rol == "DOCENTE")
+        {
+            <a href="@Url.Action("Index", "Docente")">👩‍🏫 Panel Docente</a>
+        }
+        else if (rol == "GUARDIA")
+        {
+            <a href="@Url.Action("Index", "Guardia")">🛡️ Panel Guardia</a>
+        }
+        else if (rol == "ADMINISTRATIVO")
+        {
+            <a href="@Url.Action("Index", "Administrativo")">🧾 Panel Administrativo</a>
+            <a href="@Url.Action("Usuarios", "Administrativo")">👥 Usuarios</a>
+            <a href="@Url.Action("Reportes", "Administrativo")">📊 Reportes</a>
+        }
+        else if (rol == "VISITANTE")
+        {
+            <a href="@Url.Action("Seleccionar", "Parqueaderos")">🅿️ Seleccionar parqueadero</a>
+        }
+
+        <hr />
+        <a href="@Url.Action("Logout", "Auth")">🚪 Cerrar sesión</a>
+    }
+</nav>

@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Panel Guardia";
+    var correo = (string)Session["Correo"];
+    var rol = (string)Session["Rol"];
+}
+
+<div class="card">
+    <h2>🛡️ Panel Guardia (Solo lectura)</h2>
+    <p class="muted">Correo: <strong>@correo</strong></p>
+    <p class="muted">Rol: <strong>@rol</strong></p>
+
+    <hr />
+    <p>✅ Aquí luego se verá el “monitor” de movimientos detectados por sensores.</p>
+</div>

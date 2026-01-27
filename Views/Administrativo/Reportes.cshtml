@@ -1,0 +1,54 @@
+﻿@model UISEK_ParqueaderoMVC.Models.ReporteDashboard
+@{
+    ViewBag.Title = "Reportes";
+}
+
+<div class="card">
+    <h2>📊 Reportes (Dashboard)</h2>
+    <p class="muted">Resumen de la base de datos (enfoque fuerte).</p>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+        <div class="card" style="flex:1; min-width:220px;">
+            <h3 style="margin:0;">👥 Usuarios</h3>
+            <p class="muted">Total: <strong>@Model.TotalUsuarios</strong></p>
+            <p class="muted">Activos: <strong>@Model.UsuariosActivos</strong></p>
+        </div>
+
+        <div class="card" style="flex:1; min-width:220px;">
+            <h3 style="margin:0;">🚗 Vehículos</h3>
+            <p class="muted">Total: <strong>@Model.TotalVehiculos</strong></p>
+            <p class="muted">Dentro ahora: <strong>@Model.VehiculosDentroAhora</strong></p>
+        </div>
+
+        <div class="card" style="flex:1; min-width:220px;">
+            <h3 style="margin:0;">📅 Hoy (UTC)</h3>
+            <p class="muted">Ingresos: <strong>@Model.IngresosHoy</strong></p>
+            <p class="muted">Salidas: <strong>@Model.SalidasHoy</strong></p>
+        </div>
+    </div>
+
+    <hr />
+
+    <h3>📈 Ingresos últimos 7 días</h3>
+    <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+        <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th style="padding:10px;">Día</th>
+                <th style="padding:10px;">Ingresos</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.IngresosUltimos7Dias)
+            {
+                <tr style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:10px;">@d.Dia</td>
+                    <td style="padding:10px;">@d.Cantidad</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="muted" style="margin-top:10px;">
+        Nota: la BD guarda tiempos en UTC (SYSUTCDATETIME). Está bien para auditoría.
+    </p>
+</div>

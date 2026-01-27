@@ -121,12 +121,17 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccesibilidadController.cs" />
+    <Compile Include="Controllers\AdministrativoController.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\DocenteController.cs" />
+    <Compile Include="Controllers\EstudianteController.cs" />
+    <Compile Include="Controllers\Guardia.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ParqueaderosController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ReporteDashboard.cs" />
+    <Compile Include="Models\UsuarioRow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -168,11 +173,17 @@
     <Content Include="Views\Auth\Login.cshtml" />
     <Content Include="Views\Shared\_AccessibilityBar.cshtml" />
     <Content Include="Views\Auth\RegistroVisitante.cshtml" />
-    <Content Include="Views\Parqueaderos\Seleccionar.cshtml" />
+    <Content Include="Views\Estudiante\Index.cshtml" />
+    <Content Include="Views\Docente\Docente.cshtml" />
+    <Content Include="Views\Administrativo\Index.cshtml" />
+    <Content Include="Views\Guardia\Index.cshtml" />
+    <Content Include="Views\Shared\_Menu.cshtml" />
+    <Content Include="Views\Administrativo\Usuario.cshtml" />
+    <Content Include="Views\Administrativo\Reportes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
+    <Folder Include="DAL\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

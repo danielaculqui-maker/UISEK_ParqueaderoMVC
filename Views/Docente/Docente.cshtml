@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Panel Docente";
+    var correo = (string)Session["Correo"];
+    var rol = (string)Session["Rol"];
+    var discapacidad = (bool?)(Session["TieneDiscapacidad"]) ?? false;
+}
+
+<div class="card">
+    <h2>👩‍🏫 Panel Docente</h2>
+    <p class="muted">Correo: <strong>@correo</strong></p>
+    <p class="muted">Rol: <strong>@rol</strong></p>
+    <p class="muted">Discapacidad: <strong>@(discapacidad ? "Sí" : "No")</strong></p>
+
+    <hr />
+    <p>✅ Aquí luego pondrás historial y notificaciones.</p>
+</div>

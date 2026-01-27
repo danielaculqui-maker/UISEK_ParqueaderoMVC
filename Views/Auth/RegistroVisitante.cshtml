@@ -67,11 +67,6 @@
                 cursor: pointer;
             }
 
-        a {
-            display: inline-block;
-            margin-top: 14px;
-        }
-
         /* Barra accesibilidad */
         .a11y-bar {
             display: flex;
@@ -95,13 +90,11 @@
                 background: #f2f2f2;
             }
 
-        /* Focus visible */
         :focus-visible {
             outline: 4px solid #ffbf00;
             outline-offset: 3px;
         }
 
-        /* Error */
         .error {
             margin-top: 12px;
             padding: 10px;
@@ -111,13 +104,11 @@
             color: #000;
         }
 
-        /* Dislexia */
         body.dislexia {
             letter-spacing: 0.04em;
             line-height: 1.6;
         }
 
-        /* Oscuro */
         body.oscuro {
             background: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.85)), url('/Content/Imagenes/fondo_uisek.png');
             color: #fff;
@@ -145,7 +136,6 @@
                 border-color: #2b3447;
             }
 
-        /* Contraste (modo supremo) */
         body.contraste {
             background: #fff !important;
             color: #000 !important;
@@ -180,7 +170,6 @@
                 border: 2px solid #000 !important;
             }
 
-        /* Caja fin manual */
         #finManualBox {
             margin-top: 10px;
             padding: 10px;
@@ -231,13 +220,11 @@
             border: 2px solid #000;
             color: #000;
         }
-
     </style>
 </head>
 
 <body>
     <main class="box" aria-labelledby="titulo">
-        <!-- Accesibilidad -->
         <div class="a11y-bar" role="region" aria-label="Accesibilidad">
             <button type="button" class="a11y-btn" onclick="setTheme('claro')">☀️ Claro</button>
             <button type="button" class="a11y-btn" onclick="setTheme('oscuro')">🌙 Oscuro</button>
@@ -248,9 +235,9 @@
         <h1 id="titulo">Registro temporal de visitante</h1>
         <p class="hint">Acceso limitado. Datos simulados para UISEK Parqueadero Inteligente.</p>
 
-        @if (ViewBag.Error != null)
+        @if (ViewBag.ErrorVisitante != null)
         {
-            <div class="error" role="alert">@ViewBag.Error</div>
+            <div class="error" role="alert">@ViewBag.ErrorVisitante</div>
         }
 
         @using (Html.BeginForm("RegistroVisitante", "Auth", FormMethod.Post, new { autocomplete = "on" }))
@@ -287,11 +274,7 @@
 
             <div id="finManualBox" style="display:none;">
                 <label for="finManual">Fecha y hora fin</label>
-                <input id="finManual"
-                       name="finManual"
-                       type="datetime-local"
-                       tabindex="6"
-                       aria-describedby="finHelp" />
+                <input id="finManual" name="finManual" type="datetime-local" tabindex="6" aria-describedby="finHelp" />
                 <div id="finHelp" class="hint">
                     Solo si elegiste “Otro”. Debe ser mayor a la hora actual.
                 </div>
@@ -299,19 +282,8 @@
 
             <label for="correoContacto">Correo de contacto (opcional)</label>
             <input id="correoContacto" name="correoContacto" tabindex="7" type="email" placeholder="visitante@gmail.com" />
-            <!-- ===== GEOLOCALIZACIÓN (OCULTA) ===== -->
-            <input type="hidden" id="geoLat" name="geoLat" />
-            <input type="hidden" id="geoLng" name="geoLng" />
-            <input type="hidden" id="geoPrecision" name="geoPrecision" />
-            <input type="hidden" id="geoFuente" name="geoFuente" value="NINGUNA" />
-            <button type="button"
-                    onclick="obtenerUbicacion()"
-                    style="margin-top:10px;"
-                    tabindex="8">
-                📍 Obtener ubicación (simulada)
-            </button>
 
-            <button type="submit" tabindex="9">Registrar y continuar</button>
+            <button type="submit" tabindex="8">Registrar y continuar</button>
         }
 
         <div class="footer-actions">
@@ -319,21 +291,17 @@
                 ← Volver al login
             </a>
         </div>
-
     </main>
 
     <script>
-        // ===== Persistencia A11y (igual filosofía que Login) =====
         (function () {
             var theme = localStorage.getItem("uiseK_theme") || "claro";
-
             if (theme === "oscuro") document.body.classList.add("oscuro");
 
             if (localStorage.getItem("uiseK_dislexia") === "1") {
                 document.body.classList.add("dislexia");
             }
 
-            // Contraste manda sobre temas
             if (localStorage.getItem("uiseK_contraste") === "1") {
                 document.body.classList.add("contraste");
                 document.body.classList.remove("oscuro");
@@ -342,10 +310,8 @@
         })();
 
         function setTheme(mode) {
-            // Si elige claro u oscuro, apaga contraste
             document.body.classList.remove("contraste");
             localStorage.setItem("uiseK_contraste", "0");
-
             localStorage.setItem("uiseK_theme", mode);
 
             document.body.classList.remove("oscuro");
@@ -356,15 +322,12 @@
             if (cls === "contraste") {
                 var activo = document.body.classList.toggle("contraste");
                 localStorage.setItem("uiseK_contraste", activo ? "1" : "0");
-
-                // Contraste apaga oscuro
                 if (activo) {
                     document.body.classList.remove("oscuro");
                     localStorage.setItem("uiseK_theme", "claro");
                 }
                 return;
             }
-
             document.body.classList.toggle(cls);
             localStorage.setItem("uiseK_" + cls, document.body.classList.contains(cls) ? "1" : "0");
         }
@@ -381,33 +344,6 @@
                 box.style.display = "none";
                 fin.value = "";
             }
-        }
-
-            function obtenerUbicacion() {
-            if (!navigator.geolocation) {
-                alert("Tu navegador no soporta geolocalización.");
-            return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-            function (pos) {
-                document.getElementById("geoLat").value = pos.coords.latitude.toFixed(6);
-            document.getElementById("geoLng").value = pos.coords.longitude.toFixed(6);
-            document.getElementById("geoPrecision").value = pos.coords.accuracy;
-            document.getElementById("geoFuente").value = "NAVEGADOR";
-
-            alert("Ubicación registrada correctamente ✔️");
-                },
-            function () {
-                // Simulada si falla
-                document.getElementById("geoLat").value = "-0.180653";
-            document.getElementById("geoLng").value = "-78.467834";
-            document.getElementById("geoPrecision").value = "SIMULADA";
-            document.getElementById("geoFuente").value = "SIMULADA";
-
-            alert("No se pudo obtener ubicación real. Se usó ubicación simulada.");
-                }
-            );
         }
     </script>
 </body>
