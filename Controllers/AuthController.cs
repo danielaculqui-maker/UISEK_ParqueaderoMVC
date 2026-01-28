@@ -80,7 +80,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             switch (rol)
             {
                 case "ESTUDIANTE": return RedirectToAction("MiVehiculo", "Estudiante");
-                case "DOCENTE": return RedirectToAction("Index", "Docente");
+                case "DOCENTE": return RedirectToAction("MiVehiculo", "Docente");
                 case "ADMINISTRATIVO": return RedirectToAction("Index", "Administrativo");
                 case "GUARDIA": return RedirectToAction("Index", "Guardia");
                 default:

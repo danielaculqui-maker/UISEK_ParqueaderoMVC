@@ -245,6 +245,62 @@
             --hover: #ffcc00;
             --selected: #ffcc00;
         }
+        /* =====================================
+   🌙 OVERRIDES PARA MODO OSCURO
+   (pégalo AL FINAL del <style>)
+   ===================================== */
+
+        body.oscuro header {
+            background: rgba(30,41,59,0.96) !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        body.oscuro .brand span {
+            color: #f9fafb !important;
+        }
+
+        body.oscuro .icons-header:hover {
+            background: var(--hover) !important;
+        }
+
+        /* Sidebar */
+        body.oscuro .sidebar {
+            background: rgba(30,41,59,0.96) !important;
+            border-right: 1px solid var(--border) !important;
+        }
+
+            body.oscuro .sidebar a:hover {
+                background: var(--hover) !important;
+            }
+
+        /* Panel Accesibilidad */
+        body.oscuro .acc-panel {
+            background: rgba(30,41,59,0.96) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,.45) !important;
+            color: #f9fafb !important;
+        }
+
+        body.oscuro .acc-title {
+            color: #cbd5e1 !important;
+            opacity: 1 !important;
+        }
+
+        /* Items */
+        body.oscuro .acc-item {
+            color: #e5e7eb !important;
+        }
+
+            body.oscuro .acc-item:hover {
+                background: var(--hover) !important;
+            }
+
+            /* Item activo */
+            body.oscuro .acc-item.on {
+                background: var(--selected) !important;
+                color: #dbeafe !important;
+            }
+
 
         @@media (max-width:700px) {
             .sidebar {
@@ -301,36 +357,44 @@
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Estudiante</span>
                 </a>
-              
+
             }
             else if (rol == "DOCENTE")
             {
-                <a href="@Url.Action("Index","Docente")" class="@(currentController=="Docente" ? "selected" : "")">
+                <a href="@Url.Action("MiVehiculo","Docente")"
+                   class="@(currentController=="MiVehiculo" ? "selected" : "")">
+                    <span class="sb-icon">🚗</span>
+                    <span class="sb-text">Mi Vehículo</span>
+                </a>
+
+                <a href="@Url.Action("Index","Docente")"
+                   class="@(currentController=="Docente" ? "selected" : "")">
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Docente</span>
                 </a>
-            }
-            else if (rol == "GUARDIA")
-            {
-                <a href="@Url.Action("Index","Guardia")" class="@(currentController=="Guardia" ? "selected" : "")">
-                    <span class="sb-icon">🏠</span>
-                    <span class="sb-text">Panel Guardia</span>
-                </a>
-            }
-            else if (rol == "ADMINISTRATIVO")
-            {
-                <a href="@Url.Action("Index","Administrativo")" class="@(currentController=="Administrativo" ? "selected" : "")">
-                    <span class="sb-icon">🏠</span>
-                    <span class="sb-text">Panel Administrativo</span>
-                </a>
-            }
-            else if (rol == "VISITANTE")
-            {
-                <a href="@Url.Action("Seleccionar","Parqueaderos")" class="@(currentController=="Parqueaderos" ? "selected" : "")">
-                    <span class="sb-icon">🏠</span>
-                    <span class="sb-text">Seleccionar</span>
-                </a>
-            }
+            
+        }
+        else if (rol == "GUARDIA")
+        {
+            <a href="@Url.Action("Index","Guardia")" class="@(currentController=="Guardia" ? "selected" : "")">
+                <span class="sb-icon">🏠</span>
+                <span class="sb-text">Panel Guardia</span>
+            </a>
+        }
+        else if (rol == "ADMINISTRATIVO")
+        {
+            <a href="@Url.Action("Index","Administrativo")" class="@(currentController=="Administrativo" ? "selected" : "")">
+                <span class="sb-icon">🏠</span>
+                <span class="sb-text">Panel Administrativo</span>
+            </a>
+        }
+        else if (rol == "VISITANTE")
+        {
+            <a href="@Url.Action("Seleccionar","Parqueaderos")" class="@(currentController=="Parqueaderos" ? "selected" : "")">
+                <span class="sb-icon">🏠</span>
+                <span class="sb-text">Seleccionar</span>
+            </a>
+        }
         }
 
         @* ===== Salir ===== *@

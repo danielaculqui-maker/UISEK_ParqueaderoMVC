@@ -1,174 +1,625 @@
-﻿@using System.Linq
-@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+﻿@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
 @{
-    ViewBag.Title = "Panel Estudiante";
-
-    var correo = (string)Session["Correo"];
-    var rol = (string)Session["Rol"];
-    var discapacidad = (bool?)(Session["TieneDiscapacidad"]) ?? false;
-
-    // Simulados por ahora (luego BD)
-    var estadoActivo = true;      // Activo/Inactivo
-    var permisoVigente = true;    // Vigente/No vigente
-
-    // Vehículo simulado (luego BD)
-    var tipoVehiculo = "Auto";
-    var placa = "ABC-1234";
-    var marcaModelo = "Chevrolet Spark";
+    ViewBag.Title = "Panel Docente";
 }
 
 <style>
-    .soft-card {
-        border: 0;
-        border-radius: 18px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    .panel-wrap {
+        min-height: calc(100vh - 78px);
+        padding: 10px 6px;
     }
 
-    .pill {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: .85rem;
-        line-height: 1;
+    .panel-surface {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 18px;
+        border-radius: 22px;
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+        .panel-title h2 {
+            margin: 0;
+            font-weight: 900;
+            color: var(--title);
+        }
+
+    .muted {
+        color: #6c7a89;
+        font-size: 13px;
+    }
+
+    /* Cards de estado */
+    .dash-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin: 16px 0 18px 0;
+    }
+
+    .dash-card {
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(0,0,0,.05);
+        border-radius: 18px;
+        padding: 14px 14px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    }
+
+    .dash-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        background: rgba(53,92,192,.10);
+    }
+
+    .dash-label {
+        font-size: 12px;
+        color: #6c7a89;
+    }
+
+    .dash-value {
+        font-size: 16px;
+        font-weight: 900;
+        color: #1f2d3d;
+        line-height: 1.1;
+    }
+
+    .bar-ok {
+        border-left: 6px solid #2ecc71;
+    }
+
+    .bar-warn {
+        border-left: 6px solid #f1c40f;
+    }
+
+    .bar-bad {
+        border-left: 6px solid #e74c3c;
+    }
+
+    /* Secciones */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 12px;
+    }
+
+    @@media (min-width: 900px) {
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .cardx {
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(0,0,0,.05);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    }
+
+        .cardx h3 {
+            margin: 0 0 10px 0;
+            font-weight: 900;
+            color: #1f2d3d;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    .kv {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 8px 10px;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+
+        .kv .k {
+            color: #6c7a89;
+            font-weight: 700;
+        }
+
+        .kv .v {
+            color: #1f2d3d;
+            font-weight: 800;
+        }
+
+    /* Historial */
+    .table-wrap {
+        overflow: auto;
+        border-radius: 14px;
         border: 1px solid rgba(0,0,0,.06);
     }
 
-    .pill-ok {
-        background: #e7f7ee;
-        color: #137a3a;
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 620px;
+        background: #fff;
     }
 
-    .pill-bad {
-        background: #fdecec;
-        color: #b42318;
+    th, td {
+        padding: 10px 12px;
+        font-size: 13px;
+        border-bottom: 1px solid #eef1f4;
     }
 
-    .pill-info {
-        background: #e9f2ff;
-        color: #1d4ed8;
+    th {
+        text-align: left;
+        background: #f7f9fb;
+        color: #2c3e50;
+        font-weight: 900;
     }
 
-    .kv p {
-        margin: .35rem 0;
+    tr:hover td {
+        background: #fbfdff;
     }
 
-    .kv b {
-        display: inline-block;
-        min-width: 140px;
+    .empty-state {
+        text-align: center;
+        padding: 22px 10px;
+        color: #6c7a89;
+    }
+
+        .empty-state .big {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+    /* Acciones rápidas */
+    .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .btnx {
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-weight: 900;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btnx-primary {
+        background: #355CC0;
+        color: #fff;
+    }
+
+        .btnx-primary:hover {
+            opacity: .92;
+        }
+
+    .btnx-soft {
+        background: #f3f5f7;
+        color: #1f2d3d;
+        border: 1px solid #e6eaee;
+    }
+
+        .btnx-soft:hover {
+            background: #eceff2;
+        }
+
+    /* ✅ Mini badge */
+    .badge-pill {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #fff;
+    }
+
+    .badge-green {
+        background: #2ecc71;
+    }
+
+    .badge-gray {
+        background: #95a5a6;
+    }
+
+    .badge-yellow {
+        background: #f1c40f;
+        color: #1f2d3d;
+    }
+
+    /* ✅ Mensajes */
+    .msg-ok {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin: 10px 0;
+        font-weight: 800;
+    }
+
+    .msg-err {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin: 10px 0;
+        font-weight: 800;
+    }
+
+    /* ✅ Filtro */
+    .filter-box {
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 14px;
+        padding: 12px;
+        margin: 10px 0 12px 0;
+        background: #fff;
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: end;
+    }
+
+        .filter-row label {
+            display: block;
+            font-weight: 900;
+            color: #6c7a89;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+    .inp, .sel {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid #e6eaee;
+        font-weight: 800;
+        font-size: 13px;
+        outline: none;
+        background: #fff;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(rgba(246,247,251,0.85), rgba(246,247,251,0.85)), url('/Content/Imagenes/fondo_uisek.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+        /* =========================
+       🌙 MODO OSCURO
+       ========================= */
+        body.oscuro {
+            background: linear-gradient(rgba(15,23,42,0.92), rgba(15,23,42,0.92)), url('/Content/Imagenes/fondo_uisek.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e5e7eb;
+        }
+
+            body.oscuro .panel-surface {
+                background: transparent !important;
+            }
+
+            body.oscuro .dash-card,
+            body.oscuro .cardx {
+                background: rgba(30,41,59,0.92) !important;
+                border: 1px solid rgba(255,255,255,0.08) !important;
+                box-shadow: 0 10px 25px rgba(0,0,0,.35) !important;
+                color: #e5e7eb !important;
+            }
+
+            body.oscuro .muted,
+            body.oscuro .dash-label,
+            body.oscuro .k,
+            body.oscuro .filter-row label {
+                color: #9ca3af !important;
+            }
+
+            body.oscuro .dash-value,
+            body.oscuro .v,
+            body.oscuro h2,
+            body.oscuro h3,
+            body.oscuro th,
+            body.oscuro td {
+                color: #f9fafb !important;
+            }
+
+            body.oscuro table {
+                background: rgba(30,41,59,0.92) !important;
+            }
+
+            body.oscuro th {
+                background: rgba(17,24,39,0.9) !important;
+                border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            }
+
+            body.oscuro td {
+                border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+            }
+
+            body.oscuro tr:hover td {
+                background: rgba(255,255,255,0.03) !important;
+            }
+
+            body.oscuro .inp,
+            body.oscuro .sel {
+                background: rgba(17,24,39,0.85) !important;
+                border: 1px solid rgba(255,255,255,0.10) !important;
+                color: #f9fafb !important;
+            }
+
+            body.oscuro .btnx-soft {
+                background: rgba(17,24,39,0.7) !important;
+                border: 1px solid rgba(255,255,255,0.12) !important;
+                color: #f9fafb !important;
+            }
+
+                body.oscuro .btnx-soft:hover {
+                    background: rgba(255,255,255,0.06) !important;
+                }
+
+    .top-spacer {
+        max-width: 980px;
+        margin: 0 auto 14px auto;
+        height: 16px;
+        border-top: 1px solid rgba(0,0,0,.08);
+    }
+
+    body.oscuro .top-spacer {
+        border-top: 1px solid rgba(255,255,255,.14);
     }
 </style>
 
-<div class="container mt-4">
+@{
+    bool vehiculoRegistrado = !string.IsNullOrWhiteSpace(Model?.Placa);
 
-    <div class="d-flex align-items-start justify-content-between mb-3">
-        <div>
-            <h3 class="mb-1">🎓 Panel Estudiante</h3>
-            <div class="text-muted">Resumen de tu estado y datos en el sistema.</div>
+    string estadoTxt = (Model?.EstadoActivo ?? false) ? "Activo" : "Inactivo";
+    string permisoTxt = (Model?.PermisoVigente ?? false) ? "Vigente" : "No vigente";
+    string discTxt = (Model?.TieneDiscapacidad ?? false) ? "Sí" : "No";
+
+    string barraEstado = (Model?.EstadoActivo ?? false) ? "bar-ok" : "bar-bad";
+    string barraPermiso = (Model?.PermisoVigente ?? false) ? "bar-ok" : "bar-warn";
+    string barraVeh = vehiculoRegistrado ? "bar-ok" : "bar-warn";
+
+    var nombreCompleto =
+        (Model?.NombreCompleto
+         ?? (((Model?.Nombres ?? "") + " " + (Model?.Apellidos ?? "")).Trim()))
+        .Trim();
+
+    if (string.IsNullOrWhiteSpace(nombreCompleto)) { nombreCompleto = "Usuario"; }
+
+    var estadoCampus = (Model?.EstadoEnCampus ?? "SIN REGISTROS").ToUpper();
+    string badgeClass =
+        estadoCampus == "DENTRO" ? "badge-green" :
+        estadoCampus == "FUERA" ? "badge-gray" :
+        "badge-yellow";
+
+    var qEvento = (Request["evento"] ?? "").Trim().ToUpper();
+    var qDesde = (Request["desde"] ?? "").Trim();
+    var qHasta = (Request["hasta"] ?? "").Trim();
+}
+
+<div class="panel-wrap">
+
+    <div class="panel-surface">
+
+        <div class="panel-title">
+            <span style="font-size:18px;">👩‍🏫</span>
+            <div>
+                <h2>Panel Docente</h2>
+                <div class="muted">Resumen de tu estado y datos en el sistema.</div>
+            </div>
         </div>
 
-        <div class="d-flex gap-2">
-            @if (estadoActivo)
-            {<span class="pill pill-ok">🟢 Activo</span> }
-            else
-            { <span class="pill pill-bad">🔴 Inactivo</span>}
+        <!-- Cards de estado -->
+        <div class="dash-cards">
+            <div class="dash-card @barraEstado">
+                <div class="dash-icon">🟢</div>
+                <div>
+                    <div class="dash-label">Estado</div>
+                    <div class="dash-value">@estadoTxt</div>
+                </div>
+            </div>
 
-            @if (permisoVigente)
-            {<span class="pill pill-ok">✅ Permiso vigente</span> }
-            else
-            { <span class="pill pill-bad">⛔ Permiso no vigente</span>}
-        </div>
-    </div>
+            <div class="dash-card @barraPermiso">
+                <div class="dash-icon">✅</div>
+                <div>
+                    <div class="dash-label">Permiso</div>
+                    <div class="dash-value">@permisoTxt</div>
+                </div>
+            </div>
 
-    <div class="row g-3">
-
-        <!-- Usuario -->
-        <div class="col-lg-4">
-            <div class="card soft-card">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">👤 Datos del usuario</h5>
-                    <div class="kv">
-                        <p><b>Correo:</b> @correo</p>
-                        <p><b>Rol:</b> @rol</p>
-                        <p>
-                            <b>Discapacidad:</b>
-                            <span class="pill pill-info">@((discapacidad) ? "Sí" : "No")</span>
-                        </p>
-                    </div>
+            <div class="dash-card @barraVeh">
+                <div class="dash-icon">🚗</div>
+                <div>
+                    <div class="dash-label">Vehículo</div>
+                    <div class="dash-value">@(vehiculoRegistrado ? "Registrado" : "Pendiente")</div>
                 </div>
             </div>
         </div>
 
-        <!-- Permiso -->
-        <div class="col-lg-4">
-            <div class="card soft-card">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">🚦 Permiso de ingreso</h5>
-                    <div class="kv">
-                        <p>
-                            <b>Estado:</b>
-                            @if (permisoVigente)
-                            {<span class="pill pill-ok">Vigente</span> }
-                            else
-                            { <span class="pill pill-bad">No vigente</span>}
-                        </p>
-                        <p class="text-muted mb-0">
-                            (Luego puedes mostrar fecha de vigencia / motivo si no vigente)
-                        </p>
-                    </div>
+        <div class="grid-2">
+
+            <!-- Datos del usuario -->
+            <div class="cardx">
+                <h3>👤 Datos del usuario</h3>
+                <div class="kv">
+                    <div class="k">Nombre</div>
+                    <div class="v">@nombreCompleto</div>
+
+                    <div class="k">Correo</div>
+                    <div class="v">@((Model?.Correo ?? "").ToString())</div>
+
+                    <div class="k">Rol</div>
+                    <div class="v">@((Model?.Rol ?? "").ToString())</div>
+
+                    <div class="k">Discapacidad</div>
+                    <div class="v">@discTxt</div>
+                </div>
+
+                <div class="actions">
+                    <a class="btnx btnx-primary" href="@Url.Action("MiVehiculo","Docente")">🚗 Editar vehículo</a>
+                    <a class="btnx btnx-soft" href="#">🔔 Notificaciones</a>
+                </div>
+
+                <div class="muted" style="margin-top:10px;">
+                    Tip: Mantén tu placa actualizada para permitir el acceso automático.
                 </div>
             </div>
+
+            <!-- Datos del vehículo -->
+            <div class="cardx">
+                <h3>🚘 Datos del vehículo</h3>
+
+                @if (vehiculoRegistrado)
+                {
+                    <div class="kv">
+                        <div class="k">Tipo</div>
+                        <div class="v">@((Model?.TipoVehiculo ?? "").ToString())</div>
+
+                        <div class="k">Placa</div>
+                        <div class="v">@((Model?.Placa ?? "").ToString())</div>
+
+                        <div class="k">Marca/Modelo</div>
+                        <div class="v">@((Model?.MarcaModelo ?? "").ToString())</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state" style="padding:14px 8px;">
+                        <div class="big">📝</div>
+                        <div><b>Aún no registras tu vehículo</b></div>
+                        <div class="muted">Entra a “Mi Vehículo” para guardar tu placa.</div>
+                    </div>
+                }
+            </div>
+
         </div>
 
-        <!-- Vehículo -->
-        <div class="col-lg-4">
-            <div class="card soft-card">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">🚗 Datos del vehículo</h5>
-                    <div class="kv">
-                        <p><b>Tipo:</b> @tipoVehiculo</p>
-                        <p><b>Placa:</b> @placa</p>
-                        <p><b>Marca/Modelo:</b> @(string.IsNullOrWhiteSpace(marcaModelo) ? "—" : marcaModelo)</p>
-                    </div>
+        <!-- ===========================
+         HISTORIAL + SENSORES + FILTRO
+         =========================== -->
+        <div class="cardx" style="margin-top:14px;">
+            <h3>📋 Historial de ingresos/salidas</h3>
+
+            @if (TempData["MsgHistOk"] != null)
+            {
+                <div class="msg-ok">@TempData["MsgHistOk"]</div>
+            }
+            @if (TempData["MsgHistErr"] != null)
+            {
+                <div class="msg-err">@TempData["MsgHistErr"]</div>
+            }
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 12px 0;">
+                <span class="badge-pill @badgeClass">Estado actual: @estadoCampus</span>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    @using (Html.BeginForm("SimularEntrada", "Docente", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="zona" value="Garita Sur" />
+                        <button class="btnx btnx-primary" type="submit">🟢 Simular ENTRADA</button>
+                    }
+
+                    @using (Html.BeginForm("SimularSalida", "Docente", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="zona" value="Garita Sur" />
+                        <button class="btnx btnx-soft" type="submit">🔴 Simular SALIDA</button>
+                    }
                 </div>
             </div>
-        </div>
 
-        <!-- Historial -->
-        <div class="col-12">
-            <div class="card soft-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h5 class="fw-bold mb-0">📋 Historial de ingresos/salidas</h5>
-                        <span class="pill pill-info">Solo consulta</span>
+            <!-- Filtro GET -->
+            <div class="filter-box">
+                @using (Html.BeginForm("Index", "Docente", FormMethod.Get))
+                {
+                    <div class="filter-row">
+                        <div>
+                            <label>Evento</label>
+                            <select class="sel" name="evento">
+                                <option value="" @(string.IsNullOrWhiteSpace(qEvento) ? "selected" : "")>(Todos)</option>
+                                <option value="ENTRADA" @(qEvento == "ENTRADA" ? "selected" : "")>ENTRADA</option>
+                                <option value="SALIDA" @(qEvento == "SALIDA" ? "selected" : "")>SALIDA</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Desde</label>
+                            <input class="inp" type="date" name="desde" value="@qDesde" />
+                        </div>
+
+                        <div>
+                            <label>Hasta</label>
+                            <input class="inp" type="date" name="hasta" value="@qHasta" />
+                        </div>
+
+                        <button class="btnx btnx-soft" type="submit">🔎 Filtrar</button>
+                        <a class="btnx btnx-soft" href="@Url.Action("Index","Docente")">🧹 Limpiar</a>
                     </div>
+                    <div class="muted" style="margin-top:8px;">
+                        Filtra por evento o rango de fechas.
+                    </div>
+                }
+            </div>
 
-                    <!-- Placeholder bonito (luego lo llenas desde BD) -->
-                    <div class="table-responsive mt-3">
-                        <table class="table table-sm align-middle">
-                            <thead>
+            @if (Model?.Historial != null && Model.Historial.Count > 0)
+            {
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Evento</th>
+                                <th>Zona</th>
+                                <th>Observación</th>
+                                <th>Fuente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in Model.Historial)
+                            {
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Evento</th>
-                                    <th>Zona</th>
-                                    <th>Observación</th>
+                                    <td>@m.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><b>@m.Evento</b></td>
+                                    <td>@m.Zona</td>
+                                    <td>@m.Observacion</td>
+                                    <td>@m.Fuente</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-muted" colspan="4">
-                                        Aún no hay registros para mostrar.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="text-muted mt-2">
-                        Tip: cuando conectes BD, aquí listás las últimas 10 marcas (entrada/salida).
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="big">🗓️</div>
+                    <div><b>Sin registros todavía</b></div>
+                    <div class="muted">Cuando se simulen sensores/QR, aquí aparecerán tus movimientos.</div>
+                </div>
+            }
         </div>
 
     </div>

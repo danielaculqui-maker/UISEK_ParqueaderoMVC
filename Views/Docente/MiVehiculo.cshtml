@@ -1,0 +1,226 @@
+﻿@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+@{
+    ViewBag.Title = "Mi Vehículo - Docente";
+
+    var nombreCompleto =
+        (Model?.NombreCompleto
+         ?? (((Model?.Nombres ?? "") + " " + (Model?.Apellidos ?? "")).Trim()))
+        .Trim();
+
+    if (string.IsNullOrWhiteSpace(nombreCompleto)) { nombreCompleto = "Usuario"; }
+
+    string discTxt = (Model?.TieneDiscapacidad ?? false) ? "checked" : "";
+    bool vehiculoRegistrado = !string.IsNullOrWhiteSpace(Model?.Placa);
+}
+
+<style>
+    .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 18px;
+    }
+
+    .cardx {
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        margin-bottom: 14px;
+    }
+
+    h2 {
+        margin: 0 0 10px 0;
+        font-weight: 900;
+    }
+
+    h3 {
+        margin: 0 0 10px 0;
+        font-weight: 900;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    @@media(min-width: 900px) {
+        .row {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    label {
+        display: block;
+        font-weight: 900;
+        color: #6c7a89;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .inp, .sel {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid #e6eaee;
+        font-weight: 800;
+        font-size: 13px;
+        outline: none;
+        background: #fff;
+    }
+
+    .btnx {
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-weight: 900;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btnx-primary {
+        background: #355CC0;
+        color: #fff;
+    }
+
+    .btnx-soft {
+        background: #f3f5f7;
+        color: #1f2d3d;
+        border: 1px solid #e6eaee;
+    }
+
+    .msg-ok {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin: 10px 0;
+        font-weight: 800;
+    }
+
+    .msg-err {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin: 10px 0;
+        font-weight: 800;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(rgba(246,247,251,0.85), rgba(246,247,251,0.85)), url('/Content/Imagenes/fondo_uisek.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+</style>
+
+<div class="wrap">
+
+    <h2>👩‍🏫 Mi Vehículo (Docente)</h2>
+    <div style="color:#6c7a89;font-weight:800;margin-bottom:12px;">
+        Hola, @nombreCompleto — aquí puedes actualizar tus datos y tu vehículo.
+    </div>
+
+    @if (TempData["MsgUsrOk"] != null)
+    {<div class="msg-ok">@TempData["MsgUsrOk"]</div>}
+    @if (TempData["MsgUsrErr"] != null)
+    {<div class="msg-err">@TempData["MsgUsrErr"]</div>}
+    @if (TempData["MsgVehOk"] != null)
+    {<div class="msg-ok">@TempData["MsgVehOk"]</div>}
+    @if (TempData["MsgVehErr"] != null)
+    {<div class="msg-err">@TempData["MsgVehErr"]</div>}
+
+    <!-- =========================
+         A) DATOS DEL USUARIO
+         ========================= -->
+    <div class="cardx">
+        <h3>👤 Datos del usuario</h3>
+
+        @using (Html.BeginForm("MiVehiculo", "Docente", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="accion" value="ACTUALIZAR_USUARIO" />
+            <input type="hidden" name="UsuarioId" value="@(Model?.UsuarioId ?? 0)" />
+
+            <div class="row">
+                <div>
+                    <label>Nombres</label>
+                    <input class="inp" name="nombres" value="@Model?.Nombres" />
+                </div>
+                <div>
+                    <label>Apellidos</label>
+                    <input class="inp" name="apellidos" value="@Model?.Apellidos" />
+                </div>
+                <div>
+                    <label>Cédula</label>
+                    <input class="inp" name="cedula" value="@Model?.Cedula" />
+                </div>
+                <div style="display:flex;align-items:end;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" name="tieneDiscapacidad" value="true" @discTxt />
+                        <span style="font-weight:900;">Tiene discapacidad</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btnx btnx-primary" type="submit">💾 Guardar datos</button>
+                <a class="btnx btnx-soft" href="@Url.Action("Index","Docente")">⬅ Volver al panel</a>
+            </div>
+        }
+    </div>
+
+    <!-- =========================
+         B) DATOS DEL VEHÍCULO
+         ========================= -->
+    <div class="cardx">
+        <h3>🚗 Datos del vehículo</h3>
+
+        @using (Html.BeginForm("MiVehiculo", "Docente", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="accion" value="GUARDAR_VEHICULO" />
+
+            <div class="row">
+                <div>
+                    <label>Tipo de vehículo</label>
+                    <select class="sel" name="tipoVehiculo">
+                        <option value="AUTO" @(Model?.TipoVehiculo == "AUTO" ? "selected" : "")>AUTO</option>
+                        <option value="MOTO" @(Model?.TipoVehiculo == "MOTO" ? "selected" : "")>MOTO</option>
+                        <option value="FURGONETA" @(Model?.TipoVehiculo == "FURGONETA" ? "selected" : "")>FURGONETA</option>
+                        <option value="ELECTRICO" @(Model?.TipoVehiculo == "ELECTRICO" ? "selected" : "")>ELECTRICO</option>
+                        <option value="HIBRIDO" @(Model?.TipoVehiculo == "HIBRIDO" ? "selected" : "")>HIBRIDO</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Placa</label>
+                    <input class="inp" name="placa" value="@Model?.Placa" placeholder="ABC1234" />
+                </div>
+
+                <div>
+                    <label>Marca / Modelo (opcional)</label>
+                    <input class="inp" name="marcaModelo" value="@Model?.MarcaModelo" placeholder="Mazda 3 / Kia Rio..." />
+                </div>
+
+                <div style="display:flex;align-items:end;">
+                    <div style="font-weight:900;color:#6c7a89;">
+                        Estado: @(vehiculoRegistrado ? "Registrado ✅" : "Pendiente ⚠️")
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btnx btnx-primary" type="submit">💾 Guardar vehículo</button>
+                <a class="btnx btnx-soft" href="@Url.Action("Index","Docente")">⬅ Volver al panel</a>
+            </div>
+        }
+    </div>
+</div>

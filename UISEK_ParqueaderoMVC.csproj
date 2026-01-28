@@ -131,6 +131,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\HistorialItemVM.cs" />
     <Compile Include="Models\PanelUsuarioVM.cs" />
     <Compile Include="Models\ReporteDashboard.cs" />
     <Compile Include="Models\UsuarioRow.cs" />
@@ -184,6 +185,7 @@
     <Content Include="Views\Docente\Index.cshtml" />
     <Content Include="Views\Auth\ConfirmacionVisitante.cshtml" />
     <Content Include="Views\Estudiante\MiVehiculo.cshtml" />
+    <Content Include="Views\Docente\MiVehiculo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
