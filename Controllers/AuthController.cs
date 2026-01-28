@@ -8,6 +8,10 @@ namespace UISEK_ParqueaderoMVC.Controllers
 {
     public class AuthController : Controller
     {
+        /* ============================
+           LOGIN INSTITUCIONAL
+           ============================ */
+
         // GET: /Auth/Login
         [HttpGet]
         public ActionResult Login()
@@ -24,10 +28,9 @@ namespace UISEK_ParqueaderoMVC.Controllers
             rol = (rol ?? "").Trim().ToUpper();
             bool discapacidad = tieneDiscapacidad ?? false;
 
-            // ✅ Validación dominio institucional
             if (string.IsNullOrWhiteSpace(correo) || !correo.EndsWith("@uisekp.edu.ec"))
             {
-                ViewBag.ErrorLogin = "Debe usar un correo institucional simulado con dominio @uisekp.edu.ec";
+                ViewBag.ErrorLogin = "Debe usar un correo institucional con dominio @uisekp.edu.ec";
                 return View();
             }
 
@@ -37,10 +40,10 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View();
             }
 
-            // ✅ Guardar en BD (Enfoque fuerte)
             try
             {
-                string connStr = ConfigurationManager.ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
+                string connStr = ConfigurationManager
+                    .ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 using (SqlCommand cmd = new SqlCommand("dbo.sp_LoginUpsertUsuario", conn))
@@ -52,23 +55,11 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
                     conn.Open();
 
-                    // El SP devuelve una fila con Ok y Mensaje (SELECT)
                     using (var rd = cmd.ExecuteReader())
                     {
-                        if (rd.Read())
+                        if (!rd.Read() || Convert.ToInt32(rd["Ok"]) != 1)
                         {
-                            int ok = Convert.ToInt32(rd["Ok"]);
-                            string msg = Convert.ToString(rd["Mensaje"]);
-
-                            if (ok != 1)
-                            {
-                                ViewBag.ErrorLogin = msg;
-                                return View();
-                            }
-                        }
-                        else
-                        {
-                            ViewBag.ErrorLogin = "No se pudo validar el login en la base de datos.";
+                            ViewBag.ErrorLogin = rd["Mensaje"].ToString();
                             return View();
                         }
                     }
@@ -80,29 +71,26 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View();
             }
 
-            // ✅ Sesión
             Session["Correo"] = correo;
             Session["Rol"] = rol;
             Session["TieneDiscapacidad"] = discapacidad;
 
-            // ✅ Redirección por rol
             switch (rol)
             {
-                case "ESTUDIANTE":
-                    return RedirectToAction("Index", "Estudiante");
-                case "DOCENTE":
-                    return RedirectToAction("Index", "Docente");
-                case "ADMINISTRATIVO":
-                    return RedirectToAction("Index", "Administrativo");
-                case "GUARDIA":
-                    return RedirectToAction("Index", "Guardia");
+                case "ESTUDIANTE": return RedirectToAction("Index", "Estudiante");
+                case "DOCENTE": return RedirectToAction("Index", "Docente");
+                case "ADMINISTRATIVO": return RedirectToAction("Index", "Administrativo");
+                case "GUARDIA": return RedirectToAction("Index", "Guardia");
                 default:
-                    // Si llega algo raro
                     Session.Clear();
                     ViewBag.ErrorLogin = "Rol no válido.";
                     return View();
             }
         }
+
+        /* ============================
+           REGISTRO VISITANTE
+           ============================ */
 
         // GET: /Auth/RegistroVisitante
         [HttpGet]
@@ -111,7 +99,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             return View();
         }
 
-        // POST: /Auth/RegistroVisitante ✅ SIN GEO
+        // POST: /Auth/RegistroVisitante
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult RegistroVisitante(
@@ -121,7 +109,8 @@ namespace UISEK_ParqueaderoMVC.Controllers
             string correoContacto,
             string motivo,
             int duracionHoras,
-            string finManual
+            string finManual,
+            bool? visitanteDiscapacidad
         )
         {
             if (string.IsNullOrWhiteSpace(nombre) ||
@@ -138,46 +127,81 @@ namespace UISEK_ParqueaderoMVC.Controllers
             cedula = cedula.Trim();
             correoContacto = (correoContacto ?? "").Trim();
 
-            DateTime inicio = DateTime.Now;
-            DateTime fin;
-
-            if (duracionHoras > 0)
+            try
             {
-                fin = inicio.AddHours(duracionHoras);
+                string connStr = ConfigurationManager
+                    .ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
+
+                using (SqlConnection cn = new SqlConnection(connStr))
+                {
+                    cn.Open();
+
+                    /* 1️⃣ Registrar visitante (UPsert por cédula) */
+                    using (SqlCommand cmd = new SqlCommand("dbo.sp_RegistrarVisitante", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@nombre", nombre);
+                        cmd.Parameters.AddWithValue("@cedula", cedula);
+                        cmd.Parameters.AddWithValue("@placa", placa);
+                        cmd.Parameters.AddWithValue("@correoContacto",
+                            string.IsNullOrWhiteSpace(correoContacto) ? (object)DBNull.Value : correoContacto);
+                        cmd.Parameters.AddWithValue("@tieneDiscapacidad", visitanteDiscapacidad ?? false);
+
+                        using (var rd = cmd.ExecuteReader())
+                        {
+                            if (!rd.Read() || Convert.ToInt32(rd["Ok"]) != 1)
+                            {
+                                ViewBag.ErrorVisitante = rd["Mensaje"].ToString();
+                                return View();
+                            }
+                        }
+                    }
+
+                    /* 2️⃣ Registrar INGRESO (sensor simulado) */
+                    using (SqlCommand cmdIng = new SqlCommand("dbo.sp_RegistrarIngresoVisitante", cn))
+                    {
+                        cmdIng.CommandType = CommandType.StoredProcedure;
+                        cmdIng.Parameters.AddWithValue("@placa", placa);
+                        cmdIng.Parameters.AddWithValue("@fuente", "SIMULADO");
+                        cmdIng.Parameters.AddWithValue("@observacion", "Sensor entrada (visitante)");
+                        cmdIng.ExecuteNonQuery();
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                if (string.IsNullOrWhiteSpace(finManual) || !DateTime.TryParse(finManual, out fin))
-                {
-                    ViewBag.ErrorVisitante = "Si eliges “Otro”, debes ingresar Fecha y hora fin.";
-                    return View();
-                }
-
-                if (fin <= inicio)
-                {
-                    ViewBag.ErrorVisitante = "La fecha/hora fin debe ser mayor a la hora actual.";
-                    return View();
-                }
+                ViewBag.ErrorVisitante = "Error BD: " + ex.Message;
+                return View();
             }
 
-            // Crear sesión VISITANTE (rol automático)
+            /* 3️⃣ Guardar datos para la confirmación */
             Session["Rol"] = "VISITANTE";
-            Session["Correo"] = $"visitante_{cedula}@visitante.uisekp.edu.ec";
-            Session["TieneDiscapacidad"] = false;
-
-            // Datos del visitante
             Session["NombreVisitante"] = nombre;
             Session["CedulaVisitante"] = cedula;
             Session["PlacaVisitante"] = placa;
-            Session["CorreoContactoVisitante"] = correoContacto;
             Session["MotivoVisitante"] = motivo;
 
-            Session["InicioVisita"] = inicio.ToString("yyyy-MM-dd HH:mm");
-            Session["FinVisita"] = fin.ToString("yyyy-MM-dd HH:mm");
-
-            // ✅ DIRECTO A SELECCIONAR PARQUEADERO (foto)
-            return RedirectToAction("Seleccionar", "Parqueaderos");
+            /* 4️⃣ Pantalla de confirmación */
+            return RedirectToAction("ConfirmacionVisitante", "Auth");
         }
+
+        /* ============================
+           CONFIRMACIÓN VISITANTE
+           ============================ */
+
+        // GET: /Auth/ConfirmacionVisitante
+        [HttpGet]
+        public ActionResult ConfirmacionVisitante()
+        {
+            if (Session["PlacaVisitante"] == null)
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
+        /* ============================
+           LOGOUT
+           ============================ */
 
         // GET: /Auth/Logout
         [HttpGet]

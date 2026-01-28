@@ -123,11 +123,26 @@
             color: #6b7280;
             margin-top: 6px;
         }
-
-        .checkbox {
-            margin-top: 14px;
-            font-size: 14px;
+        .check-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 1px; /* 🔥 más cerca */
+            margin-top: 10px;
         }
+
+
+
+            .check-row label {
+                margin: 0;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+
+            .check-row input[type="checkbox"] {
+                margin: 0 !important; /* 🔥 mata margin-left:auto si existe */
+                flex: 0 0 auto;
+            }
+
 
         .btn {
             width: 100%;
@@ -168,7 +183,7 @@
         .overlay {
             position: absolute;
             top: -70px;
-            bottom: -65px;
+            bottom: -95px;
             left: 0;
             width: 50%;
             height: auto;
@@ -413,7 +428,7 @@
             <section class="panel" aria-labelledby="tInst">
                 <span class="badge">🏫 Acceso Institucional</span>
                 <h1 class="title" id="tInst">Ingreso al Sistema</h1>
-                <p class="hint">Acceso simulado con roles y enfoque en accesibilidad.</p>
+                <p class="hint">Acceso con roles y enfoque en accesibilidad.</p>
 
                 @if (ViewBag.ErrorLogin != null)
                 {
@@ -433,7 +448,7 @@
                            aria-describedby="correoHelp" />
 
                     <div id="correoHelp" class="help">
-                        Debe terminar en <b>@@uisekp.edu.ec</b> (simulado).
+                        Debe terminar en <b>@@uisekp.edu.ec</b>
                     </div>
 
                     <label for="rol">Rol</label>
@@ -445,13 +460,14 @@
                         <option value="GUARDIA">Guardia</option>
                     </select>
 
-                    <div class="checkbox">
-                        <label for="tieneDiscapacidad">
-                            <input id="tieneDiscapacidad" type="checkbox"
-                                   name="tieneDiscapacidad" value="true" />
-                            ♿ Tengo discapacidad (simulado)
-                        </label>
+                    <div class="check-row">
+                        <label for="tieneDiscapacidad">♿ Tengo discapacidad </label>
+                        <input type="checkbox"
+                               id="tieneDiscapacidad"
+                               name="tieneDiscapacidad"
+                               value="true" />
                     </div>
+
 
                     <button class="btn" type="submit">Ingresar al sistema</button>
                 }
@@ -482,12 +498,12 @@
                 // CTA: ir a Visitante
                 ovTitle.innerText = "Visitante";
                 ovText.innerText  = "¿No tienes correo institucional? Regístrate temporalmente.";
-                ovBtn.innerText   = "Ir a Visitante";
+                ovBtn.innerText   = "Ir a Institucional";
             } else {
                 // CTA: ir a Institucional
                 ovTitle.innerText = "Institucional";
                 ovText.innerText  = "Ingresa con tu correo @@uisekp.edu.ec y selecciona tu rol.";
-                ovBtn.innerText   = "Ir a Institucional";
+                ovBtn.innerText   = "Ir a Visitante";
             }
         }
 

@@ -180,6 +180,7 @@
     <Content Include="Views\Administrativo\Usuarios.cshtml" />
     <Content Include="Views\Administrativo\Reportes.cshtml" />
     <Content Include="Views\Docente\Index.cshtml" />
+    <Content Include="Views\Auth\ConfirmacionVisitante.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

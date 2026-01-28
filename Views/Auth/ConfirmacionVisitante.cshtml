@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "Registro completado";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Visitante registrado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(#f6f7fb, #f6f7fb);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            max-width: 520px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.12);
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .ok {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            margin: 18px 0;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .data {
+            background: #f2f6ff;
+            border-radius: 12px;
+            padding: 14px;
+            margin: 14px 0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #000;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card" role="alert">
+        <div class="ok">✅</div>
+        <h1>Visitante registrado</h1>
+
+        <p class="info">
+            El ingreso fue detectado correctamente por el sistema.
+        </p>
+
+        <div class="data">
+            <strong>Nombre:</strong> @Session["NombreVisitante"] <br />
+            <strong>Cédula:</strong> @Session["CedulaVisitante"] <br />
+            <strong>Placa:</strong> @Session["PlacaVisitante"] <br />
+            <strong>Motivo:</strong> @Session["MotivoVisitante"]
+        </div>
+
+        <a class="btn" href="@Url.Action("Login","Auth")">
+            Ir al acceso principal
+        </a>
+
+        <a class="btn btn-secondary" href="@Url.Action("RegistroVisitante","Auth")">
+            Registrar otro visitante
+        </a>
+    </div>
+</body>
+</html>
