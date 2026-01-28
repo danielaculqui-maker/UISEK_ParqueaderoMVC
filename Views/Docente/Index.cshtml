@@ -1,19 +1,175 @@
-﻿@{
-    ViewBag.Title = "Panel Docente";
+﻿@using System.Linq
+@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+@{
+    ViewBag.Title = "Panel Estudiante";
 
-    var correo = Session["Correo"] as string;
-    var rol = Session["Rol"] as string;
+    var correo = (string)Session["Correo"];
+    var rol = (string)Session["Rol"];
+    var discapacidad = (bool?)(Session["TieneDiscapacidad"]) ?? false;
 
-    var discapacidad = false;
-    if (Session["TieneDiscapacidad"] != null)
-    {
-        bool.TryParse(Session["TieneDiscapacidad"].ToString(), out discapacidad);
-    }
+    // Simulados por ahora (luego BD)
+    var estadoActivo = true;      // Activo/Inactivo
+    var permisoVigente = true;    // Vigente/No vigente
+
+    // Vehículo simulado (luego BD)
+    var tipoVehiculo = "Auto";
+    var placa = "ABC-1234";
+    var marcaModelo = "Chevrolet Spark";
 }
 
-<div class="card">
-    <h2>👩‍🏫 Panel Docente</h2>
-    <p class="muted">Correo: <strong>@(correo ?? "N/A")</strong></p>
-    <p class="muted">Rol: <strong>@(rol ?? "N/A")</strong></p>
-    <p class="muted">Discapacidad: <strong>@(discapacidad ? "Sí" : "No")</strong></p>
+<style>
+    .soft-card {
+        border: 0;
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: .85rem;
+        line-height: 1;
+        border: 1px solid rgba(0,0,0,.06);
+    }
+
+    .pill-ok {
+        background: #e7f7ee;
+        color: #137a3a;
+    }
+
+    .pill-bad {
+        background: #fdecec;
+        color: #b42318;
+    }
+
+    .pill-info {
+        background: #e9f2ff;
+        color: #1d4ed8;
+    }
+
+    .kv p {
+        margin: .35rem 0;
+    }
+
+    .kv b {
+        display: inline-block;
+        min-width: 140px;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+            <h3 class="mb-1">🎓 Panel Estudiante</h3>
+            <div class="text-muted">Resumen de tu estado y datos en el sistema.</div>
+        </div>
+
+        <div class="d-flex gap-2">
+            @if (estadoActivo)
+            {<span class="pill pill-ok">🟢 Activo</span> }
+            else
+            { <span class="pill pill-bad">🔴 Inactivo</span>}
+
+            @if (permisoVigente)
+            {<span class="pill pill-ok">✅ Permiso vigente</span> }
+            else
+            { <span class="pill pill-bad">⛔ Permiso no vigente</span>}
+        </div>
+    </div>
+
+    <div class="row g-3">
+
+        <!-- Usuario -->
+        <div class="col-lg-4">
+            <div class="card soft-card">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">👤 Datos del usuario</h5>
+                    <div class="kv">
+                        <p><b>Correo:</b> @correo</p>
+                        <p><b>Rol:</b> @rol</p>
+                        <p>
+                            <b>Discapacidad:</b>
+                            <span class="pill pill-info">@((discapacidad) ? "Sí" : "No")</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permiso -->
+        <div class="col-lg-4">
+            <div class="card soft-card">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">🚦 Permiso de ingreso</h5>
+                    <div class="kv">
+                        <p>
+                            <b>Estado:</b>
+                            @if (permisoVigente)
+                            {<span class="pill pill-ok">Vigente</span> }
+                            else
+                            { <span class="pill pill-bad">No vigente</span>}
+                        </p>
+                        <p class="text-muted mb-0">
+                            (Luego puedes mostrar fecha de vigencia / motivo si no vigente)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehículo -->
+        <div class="col-lg-4">
+            <div class="card soft-card">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">🚗 Datos del vehículo</h5>
+                    <div class="kv">
+                        <p><b>Tipo:</b> @tipoVehiculo</p>
+                        <p><b>Placa:</b> @placa</p>
+                        <p><b>Marca/Modelo:</b> @(string.IsNullOrWhiteSpace(marcaModelo) ? "—" : marcaModelo)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="col-12">
+            <div class="card soft-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="fw-bold mb-0">📋 Historial de ingresos/salidas</h5>
+                        <span class="pill pill-info">Solo consulta</span>
+                    </div>
+
+                    <!-- Placeholder bonito (luego lo llenas desde BD) -->
+                    <div class="table-responsive mt-3">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Evento</th>
+                                    <th>Zona</th>
+                                    <th>Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted" colspan="4">
+                                        Aún no hay registros para mostrar.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-muted mt-2">
+                        Tip: cuando conectes BD, aquí listás las últimas 10 marcas (entrada/salida).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>

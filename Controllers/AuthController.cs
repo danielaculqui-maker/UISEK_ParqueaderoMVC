@@ -2,7 +2,9 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;      
 using System.Web.Mvc;
+
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -77,7 +79,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
             switch (rol)
             {
-                case "ESTUDIANTE": return RedirectToAction("Index", "Estudiante");
+                case "ESTUDIANTE": return RedirectToAction("MiVehiculo", "Estudiante");
                 case "DOCENTE": return RedirectToAction("Index", "Docente");
                 case "ADMINISTRATIVO": return RedirectToAction("Index", "Administrativo");
                 case "GUARDIA": return RedirectToAction("Index", "Guardia");
@@ -88,11 +90,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             }
         }
 
-        /* ============================
-           REGISTRO VISITANTE
-           ============================ */
-
-        // GET: /Auth/RegistroVisitante
+        // POST: /Auth/RegistroVisitante
         [HttpGet]
         public ActionResult RegistroVisitante()
         {
@@ -106,6 +104,8 @@ namespace UISEK_ParqueaderoMVC.Controllers
             string nombre,
             string cedula,
             string placa,
+            string tipoVehiculo,   // ✅ NUEVO
+            string marcaModelo,    // ✅ NUEVO
             string correoContacto,
             string motivo,
             int duracionHoras,
@@ -113,19 +113,30 @@ namespace UISEK_ParqueaderoMVC.Controllers
             bool? visitanteDiscapacidad
         )
         {
+            // 0) Validaciones mínimas
             if (string.IsNullOrWhiteSpace(nombre) ||
                 string.IsNullOrWhiteSpace(cedula) ||
                 string.IsNullOrWhiteSpace(placa) ||
                 string.IsNullOrWhiteSpace(motivo))
             {
                 ViewBag.ErrorVisitante = "Completa Nombre, Cédula, Placa y Motivo.";
-                return View();
+                return View("RegistroVisitante");
             }
 
             placa = placa.Trim().ToUpper();
             nombre = nombre.Trim();
             cedula = cedula.Trim();
+            motivo = motivo.Trim();
             correoContacto = (correoContacto ?? "").Trim();
+
+            // ✅ Normalizar tipo + marca
+            tipoVehiculo = (tipoVehiculo ?? "AUTO").Trim().ToUpper();
+            marcaModelo = (marcaModelo ?? "").Trim();
+
+            // ✅ Validar tipo permitido
+            string[] tiposValidos = { "AUTO", "MOTO", "FURGONETA", "ELECTRICO" };
+            if (!tiposValidos.Contains(tipoVehiculo))
+                tipoVehiculo = "AUTO";
 
             try
             {
@@ -136,28 +147,46 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 {
                     cn.Open();
 
-                    /* 1️⃣ Registrar visitante (UPsert por cédula) */
+                    // 1️⃣ Registrar visitante (Upsert por cédula)
                     using (SqlCommand cmd = new SqlCommand("dbo.sp_RegistrarVisitante", cn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
+
                         cmd.Parameters.AddWithValue("@nombre", nombre);
                         cmd.Parameters.AddWithValue("@cedula", cedula);
                         cmd.Parameters.AddWithValue("@placa", placa);
+
+                        // ✅ NUEVOS PARAMS
+                        cmd.Parameters.AddWithValue("@tipo", tipoVehiculo);
+                        cmd.Parameters.AddWithValue("@marcaModelo",
+                            string.IsNullOrWhiteSpace(marcaModelo) ? (object)DBNull.Value : marcaModelo);
+
                         cmd.Parameters.AddWithValue("@correoContacto",
                             string.IsNullOrWhiteSpace(correoContacto) ? (object)DBNull.Value : correoContacto);
+
                         cmd.Parameters.AddWithValue("@tieneDiscapacidad", visitanteDiscapacidad ?? false);
 
                         using (var rd = cmd.ExecuteReader())
                         {
-                            if (!rd.Read() || Convert.ToInt32(rd["Ok"]) != 1)
+                            if (!rd.Read())
                             {
-                                ViewBag.ErrorVisitante = rd["Mensaje"].ToString();
-                                return View();
+                                ViewBag.ErrorVisitante = "No se recibió respuesta del SP sp_RegistrarVisitante.";
+                                return View("RegistroVisitante");
+                            }
+
+                            // Espera columnas: Ok (int) y Mensaje (string)
+                            int ok = 0;
+                            if (rd["Ok"] != DBNull.Value) ok = Convert.ToInt32(rd["Ok"]);
+
+                            if (ok != 1)
+                            {
+                                ViewBag.ErrorVisitante = (rd["Mensaje"] ?? "No se pudo registrar.").ToString();
+                                return View("RegistroVisitante");
                             }
                         }
                     }
 
-                    /* 2️⃣ Registrar INGRESO (sensor simulado) */
+                    // 2️⃣ Registrar INGRESO (sensor simulado)
                     using (SqlCommand cmdIng = new SqlCommand("dbo.sp_RegistrarIngresoVisitante", cn))
                     {
                         cmdIng.CommandType = CommandType.StoredProcedure;
@@ -171,19 +200,24 @@ namespace UISEK_ParqueaderoMVC.Controllers
             catch (Exception ex)
             {
                 ViewBag.ErrorVisitante = "Error BD: " + ex.Message;
-                return View();
+                return View("RegistroVisitante");
             }
 
-            /* 3️⃣ Guardar datos para la confirmación */
+            // 3️⃣ Guardar datos para la confirmación
             Session["Rol"] = "VISITANTE";
             Session["NombreVisitante"] = nombre;
             Session["CedulaVisitante"] = cedula;
             Session["PlacaVisitante"] = placa;
             Session["MotivoVisitante"] = motivo;
 
-            /* 4️⃣ Pantalla de confirmación */
+            // ✅ NUEVO
+            Session["TipoVehiculoVisitante"] = tipoVehiculo;
+            Session["MarcaModeloVisitante"] = marcaModelo;
+
+            // 4️⃣ Pantalla de confirmación
             return RedirectToAction("ConfirmacionVisitante", "Auth");
         }
+
 
         /* ============================
            CONFIRMACIÓN VISITANTE

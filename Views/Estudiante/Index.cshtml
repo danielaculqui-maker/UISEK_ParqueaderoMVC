@@ -1,16 +1,59 @@
-﻿@{
+﻿@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+@{
     ViewBag.Title = "Panel Estudiante";
-    var correo = (string)Session["Correo"];
-    var rol = (string)Session["Rol"];
-    var discapacidad = (bool?)(Session["TieneDiscapacidad"]) ?? false;
 }
 
-<div class="card">
-    <h2>🎓 Panel Estudiante</h2>
-    <p class="muted">Correo: <strong>@correo</strong></p>
-    <p class="muted">Rol: <strong>@rol</strong></p>
-    <p class="muted">Discapacidad: <strong>@(discapacidad ? "Sí" : "No")</strong></p>
+<div class="card shadow-sm p-4" style="border-radius:18px;">
+    <h2 class="mb-1">🎓 Panel Estudiante</h2>
+    <p class="text-muted mb-3">Resumen de tu estado y datos en el sistema.</p>
+
+    <div class="mb-3">
+        @if (Model != null && Model.EstadoActivo)
+        {
+            <span class="badge bg-success me-2">🟢 Activo</span>
+        }
+        else
+        {
+            <span class="badge bg-danger me-2">🔴 Inactivo</span>
+        }
+
+        @if (Model != null && Model.PermisoVigente)
+        {
+            <span class="badge bg-success">✅ Permiso vigente</span>
+        }
+        else
+        {
+            <span class="badge bg-warning text-dark">⚠️ Permiso NO vigente</span>
+        }
+    </div>
+
+    @if (Model != null && !Model.PermisoVigente)
+    {
+        <div class="alert alert-warning">
+            <b>⚠️ Advertencia:</b> Tu permiso de ingreso está <b>NO vigente</b>.
+            Acércate a administración para regularizar tu situación.
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <h5 class="mt-2">👤 Datos del usuario</h5>
+            <p><b>Nombre:</b> @(Model?.NombreCompleto ?? "-")</p>
+            <p><b>Correo:</b> @(Model?.Correo ?? "-")</p>
+            <p><b>Rol:</b> @(Model?.Rol ?? "-")</p>
+            <p><b>Discapacidad:</b> @((Model != null && Model.TieneDiscapacidad) ? "Sí" : "No")</p>
+        </div>
+
+        <div class="col-md-6">
+            <h5 class="mt-2">🚗 Datos del vehículo</h5>
+            <p><b>Tipo:</b> @(string.IsNullOrWhiteSpace(Model?.TipoVehiculo) ? "-" : Model.TipoVehiculo)</p>
+            <p><b>Placa:</b> @(string.IsNullOrWhiteSpace(Model?.Placa) ? "-" : Model.Placa)</p>
+            <p><b>Marca/Modelo:</b> @(string.IsNullOrWhiteSpace(Model?.MarcaModelo) ? "-" : Model.MarcaModelo)</p>
+        </div>
+    </div>
 
     <hr />
-    <p>✅ Aquí luego pondrás historial de ingresos/salidas (solo consulta).</p>
+    <h5>📋 Historial de ingresos/salidas</h5>
+    <span class="badge bg-primary mb-2">Solo consulta</span>
+    <div class="alert alert-info">Aún no hay registros para mostrar.</div>
 </div>

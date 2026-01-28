@@ -291,10 +291,17 @@
         {
             if (rol == "ESTUDIANTE")
             {
+
+                <a href="@Url.Action("MiVehiculo","Estudiante")"
+                   class="@(currentController=="MiVehiculo" ? "selected" : "")">
+                    <span class="sb-icon">🚗</span>
+                    <span class="sb-text">Mi Vehículo</span>
+                </a>
                 <a href="@Url.Action("Index","Estudiante")" class="@(currentController=="Estudiante" ? "selected" : "")">
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Estudiante</span>
                 </a>
+              
             }
             else if (rol == "DOCENTE")
             {

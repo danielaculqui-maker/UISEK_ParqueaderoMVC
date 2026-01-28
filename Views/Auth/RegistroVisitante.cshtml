@@ -294,11 +294,26 @@
             <label for="nombre">Nombre completo</label>
             <input id="nombre" name="nombre" required tabindex="1" autocomplete="name" />
 
-            <label for="cedula">Cédula (simulada)</label>
+            <label for="cedula">Cédula</label>
             <input id="cedula" name="cedula" required tabindex="2" inputmode="numeric" />
 
             <label for="placa">Placa del vehículo</label>
             <input id="placa" name="placa" required tabindex="3" placeholder="ABC-1234" />
+
+            <label for="tipoVehiculo">Tipo de vehículo</label>
+            <select id="tipoVehiculo" name="tipoVehiculo" required tabindex="4">
+                <option value="AUTO">Auto</option>
+                <option value="MOTO">Moto</option>
+                <option value="FURGONETA">Furgoneta</option>
+                <option value="AUTOSA">vehículos eléctricos/híbridos</option>
+            </select>
+
+            <label for="marcaModelo">Marca / Modelo</label>
+            <input id="marcaModelo"
+                   name="marcaModelo"
+                   tabindex="5"
+                   placeholder="Ej: Kia Rio / Yamaha FZ" />
+
 
             <label for="motivo">Motivo de visita</label>
             <select id="motivo" name="motivo" required tabindex="4">

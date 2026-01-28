@@ -1,0 +1,48 @@
+﻿@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+@{
+    ViewBag.Title = "Mi Vehículo";
+}
+
+<div class="card shadow-sm p-4" style="border-radius:18px;">
+    <h2 class="mb-1">🚗 Mi Vehículo</h2>
+    <p class="text-muted">Registra o actualiza los datos de tu vehículo.</p>
+
+    @if (TempData["MsgOk"] != null)
+    {
+        <div class="alert alert-success">@TempData["MsgOk"]</div>
+    }
+    @if (TempData["MsgError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["MsgError"]</div>
+    }
+
+    @using (Html.BeginForm("MiVehiculo", "Estudiante", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label"><b>Tipo de vehículo</b></label>
+            <select name="tipoVehiculo" class="form-select" required>
+                <option value="AUTO" @(Model?.TipoVehiculo == "AUTO" ? "selected" : "")>Auto</option>
+                <option value="MOTO" @(Model?.TipoVehiculo == "MOTO" ? "selected" : "")>Moto</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><b>Placa</b></label>
+            <input name="placa" class="form-control" required
+                   value="@(Model?.Placa ?? "")"
+                   placeholder="Ej: ABC-1234" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><b>Marca/Modelo</b></label>
+            <input name="marcaModelo" class="form-control"
+                   value="@(Model?.MarcaModelo ?? "")"
+                   placeholder="Ej: Chevrolet Spark" />
+        </div>
+
+        <button class="btn btn-primary">Guardar</button>
+        <a class="btn btn-secondary ms-2" href="@Url.Action("Index","Estudiante")">Volver</a>
+    }
+</div>
