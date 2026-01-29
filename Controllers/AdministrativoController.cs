@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 using UISEK_ParqueaderoMVC.Models;
@@ -9,160 +9,265 @@ namespace UISEK_ParqueaderoMVC.Controllers
 {
     public class AdministrativoController : Controller
     {
-        private string ConnStr => ConfigurationManager.ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
+        private string CS => ConfigurationManager.ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
 
-        private bool EsAdmin()
-        {
-            var rol = ((string)Session["Rol"] ?? "").ToUpper();
-            return rol == "ADMINISTRATIVO";
-        }
-
-        private ActionResult BloquearSiNoAdmin()
-        {
-            if (!EsAdmin())
-                return RedirectToAction("Login", "Auth");
-            return null;
-        }
-
+        // ✅ Dashboard
+        [HttpGet]
         public ActionResult Index()
         {
-            var block = BloquearSiNoAdmin();
-            if (block != null) return block;
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+            if (rol != "ADMINISTRATIVO") return RedirectToAction("Login", "Auth");
 
-            return View();
-        }
+            var vm = new AdminDashboardVM();
+            vm.ScriptActivo = LeerScriptActivo();
 
-        // ✅ LISTA DE USUARIOS (desde BD)
-        public ActionResult Usuarios()
-        {
-            var block = BloquearSiNoAdmin();
-            if (block != null) return block;
-
-            var lista = new List<UsuarioRow>();
-
-            using (var conn = new SqlConnection(ConnStr))
+            // 1) KPIs
+            using (var con = new SqlConnection(CS))
             using (var cmd = new SqlCommand(@"
-                SELECT 
-                    u.UsuarioId,
-                    u.Correo,
-                    r.Nombre AS Rol,
-                    u.TieneDiscapacidad,
-                    u.Activo,
-                    CONVERT(varchar(19), u.FechaRegistro, 120) AS FechaRegistro,
-                    (SELECT COUNT(*) FROM dbo.Vehiculos v WHERE v.UsuarioId = u.UsuarioId) AS Vehiculos
-                FROM dbo.Usuarios u
-                INNER JOIN dbo.Roles r ON r.RolId = u.RolId
-                ORDER BY u.UsuarioId DESC;
-            ", conn))
+                SELECT
+                  (SELECT COUNT(*) FROM dbo.Usuarios WHERE Activo = 1) AS TotalUsuariosActivos,
+                  (SELECT COUNT(*) FROM dbo.Vehiculos WHERE Activo = 1) AS TotalVehiculosActivos,
+                  (SELECT COUNT(*) FROM dbo.HistorialAccesos
+                    WHERE CONVERT(date, FechaEvento) = CONVERT(date, GETDATE())
+                  ) AS MovimientosHoy;
+            ", con))
             {
-                conn.Open();
+                con.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    if (rd.Read())
+                    {
+                        vm.TotalUsuariosActivos = Convert.ToInt32(rd["TotalUsuariosActivos"]);
+                        vm.TotalVehiculosActivos = Convert.ToInt32(rd["TotalVehiculosActivos"]);
+                        vm.MovimientosHoy = Convert.ToInt32(rd["MovimientosHoy"]);
+                    }
+                }
+            }
+
+            // 2) Vehículos dentro ahora = último evento ENTRADA
+            using (var con = new SqlConnection(CS))
+            using (var cmd = new SqlCommand(@"
+                ;WITH Ultimo AS (
+                  SELECT 
+                    h.UsuarioId, h.FechaEvento, h.Evento, h.Zona, h.Fuente,
+                    ROW_NUMBER() OVER(PARTITION BY h.UsuarioId ORDER BY h.FechaEvento DESC) AS rn
+                  FROM dbo.HistorialAccesos h
+                )
+                SELECT TOP 200
+                  u.UsuarioId,
+                  u.Correo,
+                  (ISNULL(u.Nombres,'') + ' ' + ISNULL(u.Apellidos,'')) AS Nombre,
+                  v.Placa,
+                  v.Tipo,
+                  ul.FechaEvento AS FechaEntrada,
+                  ul.Zona,
+                  ul.Fuente
+                FROM Ultimo ul
+                INNER JOIN dbo.Usuarios u ON u.UsuarioId = ul.UsuarioId
+                LEFT JOIN dbo.Vehiculos v ON v.UsuarioId = u.UsuarioId AND v.Activo = 1
+                WHERE ul.rn = 1
+                  AND UPPER(LTRIM(RTRIM(ul.Evento))) = 'ENTRADA'
+                ORDER BY ul.FechaEvento DESC;
+            ", con))
+            {
+                con.Open();
                 using (var rd = cmd.ExecuteReader())
                 {
                     while (rd.Read())
                     {
-                        lista.Add(new UsuarioRow
+                        vm.VehiculosDentro.Add(new VehiculoDentroVM
                         {
                             UsuarioId = Convert.ToInt32(rd["UsuarioId"]),
-                            Correo = Convert.ToString(rd["Correo"]),
-                            Rol = Convert.ToString(rd["Rol"]),
-                            TieneDiscapacidad = Convert.ToBoolean(rd["TieneDiscapacidad"]),
-                            Activo = Convert.ToBoolean(rd["Activo"]),
-                            FechaRegistro = Convert.ToString(rd["FechaRegistro"]),
-                            Vehiculos = Convert.ToInt32(rd["Vehiculos"])
+                            Correo = rd["Correo"] == DBNull.Value ? "" : rd["Correo"].ToString(),
+                            Nombre = rd["Nombre"] == DBNull.Value ? "" : rd["Nombre"].ToString(),
+                            Placa = rd["Placa"] == DBNull.Value ? "" : rd["Placa"].ToString(),
+                            Tipo = rd["Tipo"] == DBNull.Value ? "" : rd["Tipo"].ToString(),
+                            FechaEntrada = Convert.ToDateTime(rd["FechaEntrada"]),
+                            Zona = rd["Zona"] == DBNull.Value ? "" : rd["Zona"].ToString(),
+                            Fuente = rd["Fuente"] == DBNull.Value ? "" : rd["Fuente"].ToString()
                         });
                     }
                 }
             }
 
-            return View(lista);
-        }
+            vm.DentroAhora = vm.VehiculosDentro.Count;
 
-        // ✅ REPORTES (dashboard simple)
-        public ActionResult Reportes()
-        {
-            var block = BloquearSiNoAdmin();
-            if (block != null) return block;
-
-            var dash = new ReporteDashboard();
-
-            using (var conn = new SqlConnection(ConnStr))
+            // 3) Top 7 días con mayor flujo (últimos 14 días)
+            using (var con = new SqlConnection(CS))
+            using (var cmd = new SqlCommand(@"
+                SELECT TOP 7
+                  CONVERT(date, FechaEvento) AS Dia,
+                  SUM(CASE WHEN UPPER(Evento)='ENTRADA' THEN 1 ELSE 0 END) AS Entradas,
+                  SUM(CASE WHEN UPPER(Evento)='SALIDA' THEN 1 ELSE 0 END) AS Salidas,
+                  COUNT(*) AS Total
+                FROM dbo.HistorialAccesos
+                WHERE FechaEvento >= DATEADD(day, -14, GETDATE())
+                GROUP BY CONVERT(date, FechaEvento)
+                ORDER BY Total DESC, Dia DESC;
+            ", con))
             {
-                conn.Open();
-
-                // 1) Totales usuarios / activos
-                using (var cmd = new SqlCommand(@"
-                    SELECT 
-                        COUNT(*) AS TotalUsuarios,
-                        SUM(CASE WHEN Activo = 1 THEN 1 ELSE 0 END) AS UsuariosActivos
-                    FROM dbo.Usuarios;
-                ", conn))
+                con.Open();
                 using (var rd = cmd.ExecuteReader())
                 {
-                    if (rd.Read())
-                    {
-                        dash.TotalUsuarios = Convert.ToInt32(rd["TotalUsuarios"]);
-                        dash.UsuariosActivos = Convert.ToInt32(rd["UsuariosActivos"]);
-                    }
-                }
-
-                // 2) Total vehículos
-                using (var cmd = new SqlCommand(@"SELECT COUNT(*) AS TotalVehiculos FROM dbo.Vehiculos;", conn))
-                {
-                    dash.TotalVehiculos = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-
-                // 3) Vehículos dentro ahora (movimientos abiertos)
-                using (var cmd = new SqlCommand(@"
-                    SELECT COUNT(*) 
-                    FROM dbo.Movimientos
-                    WHERE FechaSalida IS NULL;
-                ", conn))
-                {
-                    dash.VehiculosDentroAhora = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-
-                // 4) Ingresos hoy / salidas hoy (por fecha UTC)
-                using (var cmd = new SqlCommand(@"
-                    SELECT
-                        SUM(CASE WHEN CAST(FechaIngreso AS date) = CAST(SYSUTCDATETIME() AS date) THEN 1 ELSE 0 END) AS IngresosHoy,
-                        SUM(CASE WHEN FechaSalida IS NOT NULL AND CAST(FechaSalida AS date) = CAST(SYSUTCDATETIME() AS date) THEN 1 ELSE 0 END) AS SalidasHoy
-                    FROM dbo.Movimientos;
-                ", conn))
-                using (var rd = cmd.ExecuteReader())
-                {
-                    if (rd.Read())
-                    {
-                        dash.IngresosHoy = Convert.ToInt32(rd["IngresosHoy"]);
-                        dash.SalidasHoy = Convert.ToInt32(rd["SalidasHoy"]);
-                    }
-                }
-
-                // 5) Serie: ingresos últimos 7 días
-                using (var cmd = new SqlCommand(@"
-                    SELECT TOP (7)
-                        CONVERT(varchar(10), CAST(FechaIngreso AS date), 120) AS Dia,
-                        COUNT(*) AS Cantidad
-                    FROM dbo.Movimientos
-                    GROUP BY CAST(FechaIngreso AS date)
-                    ORDER BY CAST(FechaIngreso AS date) DESC;
-                ", conn))
-                using (var rd = cmd.ExecuteReader())
-                {
-                    var temp = new List<SerieDia>();
                     while (rd.Read())
                     {
-                        temp.Add(new SerieDia
+                        vm.TopDiasFlujo.Add(new FlujoDiaVM
                         {
-                            Dia = Convert.ToString(rd["Dia"]),
-                            Cantidad = Convert.ToInt32(rd["Cantidad"])
+                            Dia = Convert.ToDateTime(rd["Dia"]),
+                            Entradas = Convert.ToInt32(rd["Entradas"]),
+                            Salidas = Convert.ToInt32(rd["Salidas"]),
+                            Total = Convert.ToInt32(rd["Total"])
                         });
                     }
-                    temp.Reverse(); // para mostrar en orden ascendente
-                    dash.IngresosUltimos7Dias = temp;
                 }
             }
 
-            return View(dash);
+            return View(vm);
+        }
+
+        // ✅ JSON para gráfica (Chart.js)
+        [HttpGet]
+        public ActionResult FlujoPorDiaJson(int days = 14)
+        {
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+            if (rol != "ADMINISTRATIVO") return new HttpStatusCodeResult(403);
+
+            var labels = new List<string>();
+            var entradas = new List<int>();
+            var salidas = new List<int>();
+
+            using (var con = new SqlConnection(CS))
+            using (var cmd = new SqlCommand(@"
+                SELECT
+                  CONVERT(date, FechaEvento) AS Dia,
+                  SUM(CASE WHEN UPPER(Evento)='ENTRADA' THEN 1 ELSE 0 END) AS Entradas,
+                  SUM(CASE WHEN UPPER(Evento)='SALIDA' THEN 1 ELSE 0 END) AS Salidas
+                FROM dbo.HistorialAccesos
+                WHERE FechaEvento >= DATEADD(day, -@days, GETDATE())
+                GROUP BY CONVERT(date, FechaEvento)
+                ORDER BY Dia ASC;
+            ", con))
+            {
+                cmd.Parameters.AddWithValue("@days", days);
+                con.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read())
+                    {
+                        var d = Convert.ToDateTime(rd["Dia"]);
+                        labels.Add(d.ToString("dd/MM"));
+                        entradas.Add(Convert.ToInt32(rd["Entradas"]));
+                        salidas.Add(Convert.ToInt32(rd["Salidas"]));
+                    }
+                }
+            }
+
+            return Json(new { labels, entradas, salidas }, JsonRequestBehavior.AllowGet);
+        }
+
+        // ✅ JSON para refrescar "Dentro ahora" + tabla (AUTO-REFRESH)
+        [HttpGet]
+        public ActionResult DentroAhoraJson()
+        {
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+            if (rol != "ADMINISTRATIVO") return new HttpStatusCodeResult(403);
+
+            var items = new List<object>();
+
+            using (var con = new SqlConnection(CS))
+            using (var cmd = new SqlCommand(@"
+                ;WITH Ultimo AS (
+                  SELECT 
+                    h.UsuarioId, h.FechaEvento, h.Evento, h.Zona, h.Fuente,
+                    ROW_NUMBER() OVER(PARTITION BY h.UsuarioId ORDER BY h.FechaEvento DESC) AS rn
+                  FROM dbo.HistorialAccesos h
+                )
+                SELECT TOP 200
+                  u.UsuarioId,
+                  u.Correo,
+                  (ISNULL(u.Nombres,'') + ' ' + ISNULL(u.Apellidos,'')) AS Nombre,
+                  v.Placa,
+                  v.Tipo,
+                  ul.FechaEvento AS FechaEntrada,
+                  ul.Zona,
+                  ul.Fuente
+                FROM Ultimo ul
+                INNER JOIN dbo.Usuarios u ON u.UsuarioId = ul.UsuarioId
+                LEFT JOIN dbo.Vehiculos v ON v.UsuarioId = u.UsuarioId AND v.Activo = 1
+                WHERE ul.rn = 1
+                  AND UPPER(LTRIM(RTRIM(ul.Evento))) = 'ENTRADA'
+                ORDER BY ul.FechaEvento DESC;
+            ", con))
+            {
+                con.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read())
+                    {
+                        var fecha = Convert.ToDateTime(rd["FechaEntrada"]);
+
+                        items.Add(new
+                        {
+                            FechaEntrada = fecha.ToString("dd/MM/yyyy HH:mm"),
+                            Placa = rd["Placa"] == DBNull.Value ? "" : rd["Placa"].ToString(),
+                            Tipo = rd["Tipo"] == DBNull.Value ? "" : rd["Tipo"].ToString(),
+                            Nombre = rd["Nombre"] == DBNull.Value ? "" : rd["Nombre"].ToString(),
+                            Correo = rd["Correo"] == DBNull.Value ? "" : rd["Correo"].ToString(),
+                            Zona = rd["Zona"] == DBNull.Value ? "" : rd["Zona"].ToString(),
+                            Fuente = rd["Fuente"] == DBNull.Value ? "" : rd["Fuente"].ToString()
+                        });
+                    }
+                }
+            }
+
+            return Json(new { dentroAhora = items.Count, items }, JsonRequestBehavior.AllowGet);
+        }
+
+        // ✅ Botón activar/desactivar script
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ToggleScript()
+        {
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+            if (rol != "ADMINISTRATIVO") return RedirectToAction("Login", "Auth");
+
+            bool actual = LeerScriptActivo();
+            string nuevo = actual ? "0" : "1";
+
+            using (var con = new SqlConnection(CS))
+            using (var cmd = new SqlCommand(@"
+                UPDATE dbo.SistemaConfig
+                SET Valor = @val
+                WHERE Clave = 'SCRIPT_ACTIVO';
+            ", con))
+            {
+                cmd.Parameters.AddWithValue("@val", nuevo);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            TempData["MsgOk"] = actual ? "Sistema desactivado ⛔" : "Sistema activado ✅";
+            return RedirectToAction("Index");
+        }
+
+        private bool LeerScriptActivo()
+        {
+            try
+            {
+                using (var con = new SqlConnection(CS))
+                using (var cmd = new SqlCommand(@"
+                    SELECT TOP 1 Valor
+                    FROM dbo.SistemaConfig
+                    WHERE Clave = 'SCRIPT_ACTIVO';
+                ", con))
+                {
+                    con.Open();
+                    var val = cmd.ExecuteScalar();
+                    var s = (val == null || val == DBNull.Value) ? "1" : val.ToString().Trim();
+                    return s == "1" || s.Equals("true", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch { return true; }
         }
     }
 }

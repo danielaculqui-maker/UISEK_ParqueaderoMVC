@@ -1,8 +1,262 @@
-﻿@{
+﻿@model UISEK_ParqueaderoMVC.Models.AdminDashboardVM
+@{
     ViewBag.Title = "Panel Administrativo";
+    string badgeTxt = Model.ScriptActivo ? "✅ ACTIVO" : "⛔ INACTIVO";
 }
 
-<div class="card">
-    <h2>🧾 Panel Administrativo</h2>
-    <p class="muted">Usa el menú para ver Usuarios y Reportes.</p>
+<style>
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+        gap: 12px;
+        margin: 12px 0;
+    }
+
+    .kpi {
+        background: #fff;
+        border: 1px solid #e6eaee;
+        border-radius: 14px;
+        padding: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    }
+
+        .kpi .t {
+            color: #6c7a89;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        .kpi .v {
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+    .card {
+        background: #fff;
+        border: 1px solid #e6eaee;
+        border-radius: 14px;
+        padding: 14px;
+        margin: 12px 0;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        border-bottom: 1px solid #eef1f4;
+        font-size: 13px;
+    }
+
+    th {
+        background: #f7f9fb;
+        text-align: left;
+        font-weight: 900;
+    }
+
+    .btnx {
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    .btnx-primary {
+        background: #355CC0;
+        color: #fff;
+    }
+
+    .msg-ok {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin: 10px 0;
+        font-weight: 900;
+    }
+</style>
+
+<h2>📊 Panel Administrativo</h2>
+
+@if (TempData["MsgOk"] != null)
+{
+    <div class="msg-ok">@TempData["MsgOk"]</div>
+}
+
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div style="font-weight:900;">
+        Estado del sistema (script): <span>@badgeTxt</span>
+    </div>
+
+    @using (Html.BeginForm("ToggleScript", "Administrativo", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <button class="btnx btnx-primary" type="submit">
+            @(Model.ScriptActivo ? "⛔ Desactivar" : "✅ Activar")
+        </button>
+    }
 </div>
+
+<div class="kpi-grid">
+    <div class="kpi">
+        <div class="t">Usuarios activos</div>
+        <div class="v">@Model.TotalUsuariosActivos</div>
+    </div>
+
+    <div class="kpi">
+        <div class="t">Vehículos activos</div>
+        <div class="v">@Model.TotalVehiculosActivos</div>
+    </div>
+
+    <div class="kpi">
+        <div class="t">Dentro ahora</div>
+        <div class="v" id="kpiDentro">@Model.DentroAhora</div>
+    </div>
+
+    <div class="kpi">
+        <div class="t">Movimientos hoy</div>
+        <div class="v">@Model.MovimientosHoy</div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin:0 0 10px 0;">📈 Flujo por día (últimos 14 días)</h3>
+    <canvas id="flujoChart" height="90"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(async function(){
+  const res = await fetch('@Url.Action("FlujoPorDiaJson","Administrativo", new { days = 14 })');
+  const data = await res.json();
+
+  const ctx = document.getElementById('flujoChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [
+        { label: 'Entradas', data: data.entradas },
+        { label: 'Salidas', data: data.salidas }
+      ]
+    },
+    options: { responsive: true }
+  });
+})();
+</script>
+
+<div class="card">
+    <h3 style="margin:0 0 10px 0;">🚗 Vehículos dentro ahora</h3>
+
+    @if (Model.VehiculosDentro == null || Model.VehiculosDentro.Count == 0)
+    {
+        <div style="color:#6c7a89;font-weight:900;">Sin vehículos dentro actualmente.</div>
+    }
+    else
+    {
+        <div style="overflow:auto;">
+            <table style="min-width:900px;">
+                <thead>
+                    <tr>
+                        <th>Entrada</th>
+                        <th>Placa</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Zona</th>
+                        <th>Fuente</th>
+                    </tr>
+                </thead>
+                <tbody id="tbDentro">
+                    @foreach (var v in Model.VehiculosDentro)
+                    {
+                        <tr>
+                            <td>@v.FechaEntrada.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><b>@v.Placa</b></td>
+                            <td>@v.Tipo</td>
+                            <td>@v.Nombre</td>
+                            <td>@v.Correo</td>
+                            <td>@v.Zona</td>
+                            <td>@v.Fuente</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="card">
+    <h3 style="margin:0 0 10px 0;">🔥 Días con mayor flujo (últimos 14 días)</h3>
+
+    @if (Model.TopDiasFlujo == null || Model.TopDiasFlujo.Count == 0)
+    {
+        <div style="color:#6c7a89;font-weight:900;">Sin datos.</div>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Entradas</th>
+                    <th>Salidas</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model.TopDiasFlujo)
+                {
+                    <tr>
+                        <td>@d.Dia.ToString("dd/MM/yyyy")</td>
+                        <td>@d.Entradas</td>
+                        <td>@d.Salidas</td>
+                        <td><b>@d.Total</b></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- ✅ AUTO-REFRESH SOLO DEL "DENTRO AHORA" + TABLA -->
+<script>
+async function refrescarDentro() {
+  try {
+    const res = await fetch('@Url.Action("DentroAhoraJson","Administrativo")', { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // KPI
+    const kpi = document.getElementById("kpiDentro");
+    if (kpi) kpi.textContent = data.dentroAhora;
+
+    // Tabla
+    const tb = document.getElementById("tbDentro");
+    if (!tb) return;
+
+    tb.innerHTML = "";
+    (data.items || []).forEach(v => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${v.FechaEntrada}</td>
+        <td><b>${v.Placa}</b></td>
+        <td>${v.Tipo}</td>
+        <td>${v.Nombre}</td>
+        <td>${v.Correo}</td>
+        <td>${v.Zona}</td>
+        <td>${v.Fuente}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  } catch (e) { }
+}
+
+refrescarDentro();
+setInterval(refrescarDentro, 3000);
+</script>
+

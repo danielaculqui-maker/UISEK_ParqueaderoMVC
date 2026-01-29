@@ -2,9 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;      
+using System.Linq;
 using System.Web.Mvc;
-
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -30,16 +29,33 @@ namespace UISEK_ParqueaderoMVC.Controllers
             rol = (rol ?? "").Trim().ToUpper();
             bool discapacidad = tieneDiscapacidad ?? false;
 
+            // ✅ Validar dominio
             if (string.IsNullOrWhiteSpace(correo) || !correo.EndsWith("@uisekp.edu.ec"))
             {
                 ViewBag.ErrorLogin = "Debe usar un correo institucional con dominio @uisekp.edu.ec";
                 return View();
             }
 
+            // ✅ Validar rol
             if (string.IsNullOrWhiteSpace(rol))
             {
                 ViewBag.ErrorLogin = "Seleccione un rol.";
                 return View();
+            }
+
+            // ✅ SOLO 2 CORREOS para ADMINISTRATIVO (ANTES de tocar BD)
+            if (rol == "ADMINISTRATIVO")
+            {
+                var allowed = (ConfigurationManager.AppSettings["AdminEmails"] ?? "")
+                    .ToLower()
+                    .Split(new[] { ';', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                bool ok = allowed.Contains(correo.ToLower());
+                if (!ok)
+                {
+                    ViewBag.ErrorLogin = "No autorizado para rol ADMINISTRATIVO.";
+                    return View();
+                }
             }
 
             try
@@ -73,10 +89,12 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View();
             }
 
+            // ✅ Sesión
             Session["Correo"] = correo;
             Session["Rol"] = rol;
             Session["TieneDiscapacidad"] = discapacidad;
 
+            // ✅ Redirección por rol
             switch (rol)
             {
                 case "ESTUDIANTE": return RedirectToAction("MiVehiculo", "Estudiante");
@@ -90,7 +108,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             }
         }
 
-        // POST: /Auth/RegistroVisitante
+        // GET: /Auth/RegistroVisitante
         [HttpGet]
         public ActionResult RegistroVisitante()
         {
@@ -174,7 +192,6 @@ namespace UISEK_ParqueaderoMVC.Controllers
                                 return View("RegistroVisitante");
                             }
 
-                            // Espera columnas: Ok (int) y Mensaje (string)
                             int ok = 0;
                             if (rd["Ok"] != DBNull.Value) ok = Convert.ToInt32(rd["Ok"]);
 
@@ -217,7 +234,6 @@ namespace UISEK_ParqueaderoMVC.Controllers
             // 4️⃣ Pantalla de confirmación
             return RedirectToAction("ConfirmacionVisitante", "Auth");
         }
-
 
         /* ============================
            CONFIRMACIÓN VISITANTE

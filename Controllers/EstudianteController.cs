@@ -6,7 +6,7 @@ using UISEK_ParqueaderoMVC.Models;
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
-    public class EstudianteController : Controller
+    public class EstudianteController : BaseController
     {
         private string CS => ConfigurationManager.ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
 
@@ -447,9 +447,11 @@ namespace UISEK_ParqueaderoMVC.Controllers
         {
             using (var con = new SqlConnection(CS))
             using (var cmd = new SqlCommand(@"
-                INSERT INTO dbo.HistorialAccesos (UsuarioId, Evento, Zona, Observacion, Fuente)
-                VALUES (@id, @evento, @zona, @obs, @fuente);
-            ", con))
+        INSERT INTO dbo.HistorialAccesos
+        (UsuarioId, Evento, FechaEvento, Zona, Observacion, Fuente)
+        VALUES
+        (@id, @evento, GETDATE(), @zona, @obs, @fuente);
+    ", con))
             {
                 cmd.Parameters.AddWithValue("@id", usuarioId);
                 cmd.Parameters.AddWithValue("@evento", (evento ?? "").Trim().ToUpper());
@@ -461,6 +463,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 cmd.ExecuteNonQuery();
             }
         }
+
 
         private string InferirEstado(PanelUsuarioVM vm)
         {

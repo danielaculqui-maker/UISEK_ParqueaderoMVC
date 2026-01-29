@@ -123,6 +123,7 @@
     <Compile Include="Controllers\AccesibilidadController.cs" />
     <Compile Include="Controllers\AdministrativoController.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DocenteController.cs" />
     <Compile Include="Controllers\EstudianteController.cs" />
     <Compile Include="Controllers\Guardia.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AdminDashboardVM.cs" />
     <Compile Include="Models\HistorialItemVM.cs" />
     <Compile Include="Models\PanelUsuarioVM.cs" />
     <Compile Include="Models\ReporteDashboard.cs" />

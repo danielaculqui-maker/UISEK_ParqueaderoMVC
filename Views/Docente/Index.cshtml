@@ -4,6 +4,7 @@
 }
 
 <style>
+    /* (TODO TU CSS IGUAL, NO TOCADO) */
     .panel-wrap {
         min-height: calc(100vh - 78px);
         padding: 10px 6px;
@@ -34,7 +35,6 @@
         font-size: 13px;
     }
 
-    /* Cards de estado */
     .dash-cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -87,7 +87,6 @@
         border-left: 6px solid #e74c3c;
     }
 
-    /* Secciones */
     .grid-2 {
         display: grid;
         grid-template-columns: 1fr;
@@ -137,7 +136,6 @@
             font-weight: 800;
         }
 
-    /* Historial */
     .table-wrap {
         overflow: auto;
         border-radius: 14px;
@@ -179,7 +177,6 @@
             margin-bottom: 8px;
         }
 
-    /* Acciones rápidas */
     .actions {
         display: flex;
         gap: 10px;
@@ -218,7 +215,6 @@
             background: #eceff2;
         }
 
-    /* ✅ Mini badge */
     .badge-pill {
         padding: 6px 10px;
         border-radius: 999px;
@@ -243,7 +239,6 @@
         color: #1f2d3d;
     }
 
-    /* ✅ Mensajes */
     .msg-ok {
         background: #d4edda;
         color: #155724;
@@ -262,7 +257,6 @@
         font-weight: 800;
     }
 
-    /* ✅ Filtro */
     .filter-box {
         border: 1px solid rgba(0,0,0,.06);
         border-radius: 14px;
@@ -305,9 +299,6 @@
         background-attachment: fixed;
     }
 
-        /* =========================
-       🌙 MODO OSCURO
-       ========================= */
         body.oscuro {
             background: linear-gradient(rgba(15,23,42,0.92), rgba(15,23,42,0.92)), url('/Content/Imagenes/fondo_uisek.png');
             background-size: cover;
@@ -320,27 +311,18 @@
                 background: transparent !important;
             }
 
-            body.oscuro .dash-card,
-            body.oscuro .cardx {
+            body.oscuro .dash-card, body.oscuro .cardx {
                 background: rgba(30,41,59,0.92) !important;
                 border: 1px solid rgba(255,255,255,0.08) !important;
                 box-shadow: 0 10px 25px rgba(0,0,0,.35) !important;
                 color: #e5e7eb !important;
             }
 
-            body.oscuro .muted,
-            body.oscuro .dash-label,
-            body.oscuro .k,
-            body.oscuro .filter-row label {
+            body.oscuro .muted, body.oscuro .dash-label, body.oscuro .k, body.oscuro .filter-row label {
                 color: #9ca3af !important;
             }
 
-            body.oscuro .dash-value,
-            body.oscuro .v,
-            body.oscuro h2,
-            body.oscuro h3,
-            body.oscuro th,
-            body.oscuro td {
+            body.oscuro .dash-value, body.oscuro .v, body.oscuro h2, body.oscuro h3, body.oscuro th, body.oscuro td {
                 color: #f9fafb !important;
             }
 
@@ -361,8 +343,7 @@
                 background: rgba(255,255,255,0.03) !important;
             }
 
-            body.oscuro .inp,
-            body.oscuro .sel {
+            body.oscuro .inp, body.oscuro .sel {
                 background: rgba(17,24,39,0.85) !important;
                 border: 1px solid rgba(255,255,255,0.10) !important;
                 color: #f9fafb !important;
@@ -393,11 +374,18 @@
 @{
     bool vehiculoRegistrado = !string.IsNullOrWhiteSpace(Model?.Placa);
 
-    string estadoTxt = (Model?.EstadoActivo ?? false) ? "Activo" : "Inactivo";
+    // ✅ Estado del sistema (script) viene del controller (SistemaConfig)
+    bool scriptActivo = (ViewBag.ScriptActivo as bool?) ?? false;
+    string estadoSistemaTxt = scriptActivo ? "Activo" : "Inactivo";
+    string barraSistema = scriptActivo ? "bar-ok" : "bar-bad";
+    string iconoSistema = scriptActivo ? "🟢" : "🔴";
+
+    // ✅ Estado del usuario (tabla Usuarios.Activo)
+    string estadoUsuarioTxt = (Model?.EstadoActivo ?? false) ? "Activo" : "Inactivo";
     string permisoTxt = (Model?.PermisoVigente ?? false) ? "Vigente" : "No vigente";
     string discTxt = (Model?.TieneDiscapacidad ?? false) ? "Sí" : "No";
 
-    string barraEstado = (Model?.EstadoActivo ?? false) ? "bar-ok" : "bar-bad";
+    string barraUsuario = (Model?.EstadoActivo ?? false) ? "bar-ok" : "bar-bad";
     string barraPermiso = (Model?.PermisoVigente ?? false) ? "bar-ok" : "bar-warn";
     string barraVeh = vehiculoRegistrado ? "bar-ok" : "bar-warn";
 
@@ -420,7 +408,6 @@
 }
 
 <div class="panel-wrap">
-
     <div class="panel-surface">
 
         <div class="panel-title">
@@ -433,11 +420,22 @@
 
         <!-- Cards de estado -->
         <div class="dash-cards">
-            <div class="dash-card @barraEstado">
-                <div class="dash-icon">🟢</div>
+
+            <!-- ✅ NUEVA: Sistema (script) -->
+            <div class="dash-card @barraSistema">
+                <div class="dash-icon">@iconoSistema</div>
                 <div>
-                    <div class="dash-label">Estado</div>
-                    <div class="dash-value">@estadoTxt</div>
+                    <div class="dash-label">Sistema (script)</div>
+                    <div class="dash-value">@estadoSistemaTxt</div>
+                </div>
+            </div>
+
+            <!-- ✅ Antes decía "Estado", ahora "Usuario" -->
+            <div class="dash-card @barraUsuario">
+                <div class="dash-icon">👤</div>
+                <div>
+                    <div class="dash-label">Usuario</div>
+                    <div class="dash-value">@estadoUsuarioTxt</div>
                 </div>
             </div>
 
@@ -460,7 +458,6 @@
 
         <div class="grid-2">
 
-            <!-- Datos del usuario -->
             <div class="cardx">
                 <h3>👤 Datos del usuario</h3>
                 <div class="kv">
@@ -487,7 +484,6 @@
                 </div>
             </div>
 
-            <!-- Datos del vehículo -->
             <div class="cardx">
                 <h3>🚘 Datos del vehículo</h3>
 
@@ -516,20 +512,13 @@
 
         </div>
 
-        <!-- ===========================
-         HISTORIAL + SENSORES + FILTRO
-         =========================== -->
         <div class="cardx" style="margin-top:14px;">
             <h3>📋 Historial de ingresos/salidas</h3>
 
             @if (TempData["MsgHistOk"] != null)
-            {
-                <div class="msg-ok">@TempData["MsgHistOk"]</div>
-            }
+            {<div class="msg-ok">@TempData["MsgHistOk"]</div>}
             @if (TempData["MsgHistErr"] != null)
-            {
-                <div class="msg-err">@TempData["MsgHistErr"]</div>
-            }
+            {<div class="msg-err">@TempData["MsgHistErr"]</div>}
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 12px 0;">
                 <span class="badge-pill @badgeClass">Estado actual: @estadoCampus</span>
@@ -551,7 +540,6 @@
                 </div>
             </div>
 
-            <!-- Filtro GET -->
             <div class="filter-box">
                 @using (Html.BeginForm("Index", "Docente", FormMethod.Get))
                 {
@@ -624,3 +612,4 @@
 
     </div>
 </div>
+
