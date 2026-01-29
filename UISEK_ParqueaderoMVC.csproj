@@ -46,6 +46,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Rotativa, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Rotativa.1.7.3\lib\net461\Rotativa.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -117,6 +120,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\AppState.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -126,7 +130,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DocenteController.cs" />
     <Compile Include="Controllers\EstudianteController.cs" />
-    <Compile Include="Controllers\Guardia.cs" />
+    <Compile Include="Controllers\GuardiaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DAL\PanelDAL.cs" />
     <Compile Include="Global.asax.cs">
@@ -135,9 +139,11 @@
     <Compile Include="Models\AdminDashboardVM.cs" />
     <Compile Include="Models\AdminUsuarioVM.cs" />
     <Compile Include="Models\AdminVehiculoVM.cs" />
+    <Compile Include="Models\EventoMapa.cs" />
     <Compile Include="Models\HistorialItemVM.cs" />
     <Compile Include="Models\PanelUsuarioVM.cs" />
     <Compile Include="Models\ReporteDashboard.cs" />
+    <Compile Include="Models\UsuarioReporteVM.cs" />
     <Compile Include="Models\UsuarioRow.cs" />
     <Compile Include="Models\VehiculoAdminDetallesVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -152,8 +158,13 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Rotativa\help-wkhtmltoimage.txt" />
+    <Content Include="Rotativa\help-wkhtmltopdf.txt" />
+    <Content Include="Rotativa\wkhtmltoimage.exe" />
+    <Content Include="Rotativa\wkhtmltopdf.exe" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="App_Browsers\qt.browser" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -187,7 +198,6 @@
     <Content Include="Views\Guardia\Index.cshtml" />
     <Content Include="Views\Shared\_Menu.cshtml" />
     <Content Include="Views\Administrativo\Usuarios.cshtml" />
-    <Content Include="Views\Administrativo\Reportes.cshtml" />
     <Content Include="Views\Docente\Index.cshtml" />
     <Content Include="Views\Auth\ConfirmacionVisitante.cshtml" />
     <Content Include="Views\Estudiante\MiVehiculo.cshtml" />
@@ -197,6 +207,9 @@
     <Content Include="Views\Administrativo\Vehiculos.cshtml" />
     <Content Include="Views\Administrativo\VehiculoDetalles.cshtml" />
     <Content Include="Views\Administrativo\VehiculoEditar.cshtml" />
+    <Content Include="Views\Administrativo\ReporteVehiculosPDF.cshtml" />
+    <Content Include="Views\Administrativo\ReporteUsuariosPDF.cshtml" />
+    <Content Include="Views\Shared\Mapa.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -3,7 +3,11 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 using UISEK_ParqueaderoMVC.Models;
-using UISEK_ParqueaderoMVC.Services; // ✅ NUEVO (EmailService)
+using UISEK_ParqueaderoMVC.Services;
+using System.Collections.Generic;
+
+
+
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -313,5 +317,54 @@ namespace UISEK_ParqueaderoMVC.Controllers
             if (ultimo == "SALIDA") return "FUERA";
             return "SIN REGISTROS";
         }
+
+        // ===========================
+        // GET: /Docente/Mapa
+        // ===========================
+        [HttpGet]
+        public ActionResult Mapa()
+        {
+            var correo = (Session["Correo"] as string ?? "").Trim().ToLower();
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+
+            if (string.IsNullOrWhiteSpace(correo)) return RedirectToAction("Login", "Auth");
+            if (rol != "DOCENTE") return RedirectToAction("Login", "Auth");
+
+            var eventos = new List<EventoMapa>
+            {
+                new EventoMapa{
+                    Id = 1,
+                    Titulo = "Hoy: Parqueadero BLOQUEADO",
+                    Tipo = "BLOQUEO",
+                    Descripcion = "Mantenimiento programado",
+                    Fecha = DateTime.Now,
+                    Latitud = -0.1807m,
+                    Longitud = -78.4678m
+                },
+                new EventoMapa{
+                    Id = 2,
+                    Titulo = "Cupo disponible: Zona A",
+                    Tipo = "DISPONIBLE",
+                    Descripcion = "3 libres",
+                    Fecha = DateTime.Now,
+                    Latitud = -0.1815m,
+                    Longitud = -78.4681m
+                },
+                new EventoMapa{
+                    Id = 3,
+                    Titulo = "Alerta: Entrada congestionada",
+                    Tipo = "ALERTA",
+                    Descripcion = "Evita la garita principal",
+                    Fecha = DateTime.Now,
+                    Latitud = -0.1802m,
+                    Longitud = -78.4669m
+                }
+            };
+
+            // ✅ Vista compartida (la misma que Estudiante)
+            return View("~/Views/Shared/Mapa.cshtml", eventos);
+        }
+
+
     }
 }

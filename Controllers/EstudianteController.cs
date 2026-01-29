@@ -3,7 +3,9 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 using UISEK_ParqueaderoMVC.Models;
-using UISEK_ParqueaderoMVC.Services; // ✅ NUEVO (EmailService)
+using UISEK_ParqueaderoMVC.Services;
+using System.Collections.Generic;
+
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -178,6 +180,52 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
             TempData["MsgVehOk"] = "Vehículo guardado ✅";
             return RedirectToAction("MiVehiculo");
+        }
+        // ===========================
+        // GET: /Estudiante/Mapa
+        // ===========================
+        [HttpGet]
+        public ActionResult Mapa()
+        {
+            // ✅ Seguridad básica
+            var correo = (Session["Correo"] as string ?? "").Trim().ToLower();
+            if (string.IsNullOrWhiteSpace(correo))
+                return RedirectToAction("Login", "Auth");
+
+            // ✅ Simulado (puedes luego reemplazar por BD)
+            var eventos = new List<EventoMapa>
+    {
+        new EventoMapa{
+            Id = 1,
+            Titulo = "Hoy: Parqueadero BLOQUEADO",
+            Tipo = "BLOQUEO",
+            Descripcion = "Mantenimiento programado",
+            Fecha = DateTime.Now,
+            Latitud = -0.1807m,
+            Longitud = -78.4678m
+        },
+        new EventoMapa{
+            Id = 2,
+            Titulo = "Cupo disponible: Zona A",
+            Tipo = "DISPONIBLE",
+            Descripcion = "3 libres",
+            Fecha = DateTime.Now,
+            Latitud = -0.1815m,
+            Longitud = -78.4681m
+        },
+        new EventoMapa{
+            Id = 3,
+            Titulo = "Alerta: Entrada congestionada",
+            Tipo = "ALERTA",
+            Descripcion = "Evita la garita principal",
+            Fecha = DateTime.Now,
+            Latitud = -0.1802m,
+            Longitud = -78.4669m
+        }
+    };
+
+            // ✅ Usa la vista compartida
+            return View("~/Views/Shared/Mapa.cshtml", eventos);
         }
 
         // ==================================================

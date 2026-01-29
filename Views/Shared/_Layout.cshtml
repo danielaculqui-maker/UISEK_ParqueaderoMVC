@@ -1,7 +1,7 @@
 ﻿@{
     var correo = (string)Session["Correo"];
     var rol = ((string)Session["Rol"] ?? "").ToUpper();
-    var nombreSistema = "UISEK Parqueadero Inteligente";
+    var nombreSistema = "SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK";
 
     var dislexia = (Session["ModoDislexia"] as bool?) ?? false;
     var oscuro = (Session["ModoOscuro"] as bool?) ?? false;
@@ -108,12 +108,12 @@
 
         /* ===== ACCESIBILIDAD (HOVER + DELAY) ===== */
         .acc-dd {
-            position: relative
+            position: relative;
         }
 
         .acc-panel {
-            position: absolute;
-            top: 52px;
+            position: fixed;
+            top: 40px;
             right: 0;
             background: #fff;
             border: 1px solid var(--border);
@@ -127,7 +127,7 @@
         }
 
         .acc-dd.open .acc-panel {
-            display: flex
+            display: flex;
         }
 
         .acc-title {
@@ -172,7 +172,7 @@
         }
 
             .sidebar:hover {
-                width: 260px
+                width: 260px;
             }
 
             .sidebar a {
@@ -185,22 +185,23 @@
                 text-decoration: none;
                 color: inherit;
                 white-space: nowrap;
-            }
-
-                .sidebar a:hover {
-                    background: var(--hover)
-                }
-
-            /* ===== ARREGLO: ICONO GRANDE SIN AGRANDAR TEXTO ===== */
-
-            .sidebar a {
-                font-size: 14px; /* texto normal */
+                font-size: 14px;
                 line-height: 1.1;
             }
 
+                .sidebar a:hover {
+                    background: var(--hover);
+                }
+
+                .sidebar a.selected {
+                    background: var(--selected);
+                    color: var(--primary);
+                    font-weight: 800;
+                }
+
             .sidebar .sb-icon {
-                font-size: 24px; /* tamaño del emoji */
-                width: 34px; /* caja fija del icono */
+                font-size: 24px;
+                width: 34px;
                 height: 34px;
                 display: inline-flex;
                 align-items: center;
@@ -209,7 +210,7 @@
             }
 
             .sidebar .sb-text {
-                font-size: 14px; /* texto NO se agranda */
+                font-size: 14px;
             }
 
         /* ===== MAIN ===== */
@@ -221,13 +222,13 @@
         }
 
         .sidebar:hover ~ main {
-            margin-left: 260px
+            margin-left: 260px;
         }
 
         /* ===== MODOS ===== */
         body.dislexia {
             letter-spacing: .4px;
-            line-height: 1.6
+            line-height: 1.6;
         }
 
         body.oscuro {
@@ -245,11 +246,8 @@
             --hover: #ffcc00;
             --selected: #ffcc00;
         }
-        /* =====================================
-   🌙 OVERRIDES PARA MODO OSCURO
-   (pégalo AL FINAL del <style>)
-   ===================================== */
 
+        /* ===== OVERRIDES PARA MODO OSCURO ===== */
         body.oscuro header {
             background: rgba(30,41,59,0.96) !important;
             border-bottom: 1px solid var(--border) !important;
@@ -263,7 +261,6 @@
             background: var(--hover) !important;
         }
 
-        /* Sidebar */
         body.oscuro .sidebar {
             background: rgba(30,41,59,0.96) !important;
             border-right: 1px solid var(--border) !important;
@@ -273,7 +270,6 @@
                 background: var(--hover) !important;
             }
 
-        /* Panel Accesibilidad */
         body.oscuro .acc-panel {
             background: rgba(30,41,59,0.96) !important;
             border: 1px solid var(--border) !important;
@@ -286,7 +282,6 @@
             opacity: 1 !important;
         }
 
-        /* Items */
         body.oscuro .acc-item {
             color: #e5e7eb !important;
         }
@@ -295,23 +290,123 @@
                 background: var(--hover) !important;
             }
 
-            /* Item activo */
             body.oscuro .acc-item.on {
                 background: var(--selected) !important;
                 color: #dbeafe !important;
             }
+/* ===== TOP PANELS (💬 ❓ 🔔) ===== */
+        header {
+            z-index: 300;
+        }
+
+/* 🔥 CAMBIO CLAVE: fixed para que no tape el mapa */
+.top-panel {
+    position: fixed;
+    top: 80px;                 /* debajo del header */
+    right: 18px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.12);
+    width: 320px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.top-dd.open .top-panel {
+    display: flex;
+}
+
+.top-head {
+    background: #111;
+    color: #fff;
+    padding: .65rem .85rem;
+    font-weight: 900;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.top-body {
+    max-height: 300px;
+    overflow: auto;
+}
+
+.top-item {
+    padding: .65rem .85rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.top-item:last-child {
+    border-bottom: none;
+}
+
+.top-muted {
+    padding: .9rem .85rem;
+    font-size: 13px;
+    opacity: .7;
+}
+
+.badge-mini {
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    padding: 0 6px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+}
+
+/* ===== MODO OSCURO (letras visibles SIEMPRE) ===== */
+body.oscuro .top-panel {
+    background: rgba(15,23,42,0.98) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,.45) !important;
+    color: #f9fafb !important;
+}
+
+body.oscuro .top-head {
+    background: #020617 !important;
+    color: #fff !important;
+}
+
+body.oscuro .top-item {
+    color: #e5e7eb !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+body.oscuro .top-muted {
+    color: #cbd5e1 !important;
+    opacity: 1 !important;
+}
+
+/
+}
 
 
         @@media (max-width:700px) {
             .sidebar {
-                width: 0
+                width: 0;
             }
 
             main {
-                margin-left: 0
+                margin-left: 0;
+            }
+
+            .brand span {
+                display: none;
             }
         }
     </style>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 
 <body class="@bodyClass">
@@ -319,17 +414,105 @@
     <header>
         <div class="brand">
             <img src="@Url.Content("~/Content/Imagenes/logo_uisek.jpg")" alt="UISEK" />
-            <span>UISEK Parqueadero Inteligente</span>
+            <span>@nombreSistema</span>
         </div>
 
         <div class="right">
-            <div class="icons-header">💬</div>
-            <div class="icons-header">❓</div>
-            <div class="icons-header">🔔</div>
 
-            <!-- Accesibilidad (igual que antes) -->
+            <!-- 💬 Mensajes -->
+            <div class="top-dd" id="ddMsg">
+                <div class="icons-header" title="Mensajes">💬</div>
+
+                <div class="top-panel">
+                    <div class="top-head">
+                        <span>💬 Mensajes</span>
+                        <span class="badge-mini" style="background:#dc3545;color:#fff;">
+                            @((ViewBag.MsgCount as int?) ?? 0)
+                        </span>
+                    </div>
+
+                    <div class="top-body">
+                        @{
+                            var msgs = ViewBag.TopMensajes as IEnumerable<string>;
+                        }
+                        @if (msgs != null && msgs.Any())
+                        {
+                            foreach (var m in msgs)
+                            {
+                                <div class="top-item">@m</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="top-muted">No hay mensajes nuevos.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ❓ Ayuda -->
+            <div class="top-dd" id="ddHelp">
+                <div class="icons-header" title="Ayuda">❓</div>
+
+                <div class="top-panel">
+                    <div class="top-head">
+                        <span>❓ Ayuda rápida</span>
+                        <span class="badge-mini" style="background:#0d6efd;color:#fff;">i</span>
+                    </div>
+
+                    <div class="top-body">
+                        <div class="top-item">🗺️ En el mapa verás bloqueos, cupos y alertas.</div>
+                        <div class="top-item">🔔 Si sale “Hoy: bloqueado”, cambia de zona o espera “Liberado”.</div>
+
+                        <div class="top-item">
+                            <a style="text-decoration:none;color:inherit;"
+                               href="@Url.Action("Index",
+                                    rol=="DOCENTE" ? "Docente" :
+                                    rol=="GUARDIA" ? "Guardia" :
+                                    rol=="ADMINISTRATIVO" ? "Administrativo" :
+                                    rol=="VISITANTE" ? "Parqueaderos" :
+                                    "Estudiante")">
+                                🏠 Ir a mi panel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔔 Notificaciones -->
+            <div class="top-dd" id="ddNotif">
+                <div class="icons-header" title="Notificaciones">🔔</div>
+
+                <div class="top-panel">
+                    <div class="top-head">
+                        <span>🔔 Notificaciones</span>
+                        <span class="badge-mini" style="background:#ffc107;color:#111;">
+                            @((ViewBag.NotifCount as int?) ?? 0)
+                        </span>
+                    </div>
+
+                    <div class="top-body">
+                        @{
+                            var notifs = ViewBag.TopNotifs as IEnumerable<string>;
+                        }
+                        @if (notifs != null && notifs.Any())
+                        {
+                            foreach (var n in notifs)
+                            {
+                                <div class="top-item">@n</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="top-muted">Todo tranquilo por ahora 😌</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesibilidad -->
             <div class="acc-dd" id="accDD">
-                <div class="icons-header">♿</div>
+                <div class="icons-header" title="Accesibilidad">♿</div>
                 <div class="acc-panel">
                     <div class="acc-title">Accesibilidad</div>
                     <a class="acc-item @(dislexia?"on":"")" href="@Url.Action("Dislexia","Accesibilidad")">📖 Dislexia</a>
@@ -337,97 +520,120 @@
                     <a class="acc-item @(contraste?"on":"")" href="@Url.Action("Contraste","Accesibilidad")">🌓 Contraste</a>
                 </div>
             </div>
+
         </div>
     </header>
 
     <div class="sidebar">
-
-        @* ===== Link principal según rol ===== *@
         @if (!string.IsNullOrWhiteSpace(rol))
         {
             if (rol == "ESTUDIANTE")
             {
-
                 <a href="@Url.Action("MiVehiculo","Estudiante")"
-                   class="@(currentController=="MiVehiculo" ? "selected" : "")">
+                   class="@(currentAction=="MiVehiculo" && currentController=="Estudiante" ? "selected" : "")">
                     <span class="sb-icon">🚗</span>
                     <span class="sb-text">Mi Vehículo</span>
                 </a>
-                <a href="@Url.Action("Index","Estudiante")" class="@(currentController=="Estudiante" ? "selected" : "")">
+
+                <a href="@Url.Action("Index","Estudiante")"
+                   class="@(currentController=="Estudiante" && currentAction=="Index" ? "selected" : "")">
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Estudiante</span>
                 </a>
 
+                <a href="@Url.Action("Mapa","Estudiante")"
+                   class="@(currentController=="Estudiante" && currentAction=="Mapa" ? "selected" : "")">
+                    <span class="sb-icon">🗺️</span>
+                    <span class="sb-text">Mapa Parqueadero</span>
+                </a>
             }
             else if (rol == "DOCENTE")
             {
                 <a href="@Url.Action("MiVehiculo","Docente")"
-                   class="@(currentController=="MiVehiculo" ? "selected" : "")">
+                   class="@(currentAction=="MiVehiculo" && currentController=="Docente" ? "selected" : "")">
                     <span class="sb-icon">🚗</span>
                     <span class="sb-text">Mi Vehículo</span>
                 </a>
 
                 <a href="@Url.Action("Index","Docente")"
-                   class="@(currentController=="Docente" ? "selected" : "")">
+                   class="@(currentController=="Docente" && currentAction=="Index" ? "selected" : "")">
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Docente</span>
                 </a>
 
+                <a href="@Url.Action("Mapa","Docente")"
+                   class="@(currentController=="Docente" && currentAction=="Mapa" ? "selected" : "")">
+                    <span class="sb-icon">🗺️</span>
+                    <span class="sb-text">Mapa Parqueadero</span>
+                </a>
             }
             else if (rol == "GUARDIA")
             {
-                <a href="@Url.Action("Index","Guardia")" class="@(currentController=="Guardia" ? "selected" : "")">
+                <a href="@Url.Action("Index","Guardia")"
+                   class="@(currentController=="Guardia" ? "selected" : "")">
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Guardia</span>
                 </a>
             }
             else if (rol == "ADMINISTRATIVO")
             {
-                <a href="@Url.Action("Index","Administrativo")" class="@(currentController=="Administrativo" ? "selected" : "")">
+                <a href="@Url.Action("Index","Administrativo")"
+                   class="@(currentController=="Administrativo" && currentAction=="Index" ? "selected" : "")">
                     <span class="sb-icon">📊</span>
                     <span class="sb-text">Panel Administrativo</span>
                 </a>
 
-                <a href="@Url.Action("Usuarios","Administrativo")" class="@(currentAction=="Usuarios" ? "selected" : "")">
+                <a href="@Url.Action("Usuarios","Administrativo")"
+                   class="@(currentController=="Administrativo" && currentAction=="Usuarios" ? "selected" : "")">
                     <span class="sb-icon">👥</span>
                     <span class="sb-text">Gestionar Personas</span>
                 </a>
 
-                <a href="@Url.Action("Vehiculos","Administrativo")" class="@(currentAction=="Vehiculos" ? "selected" : "")">
+                <a href="@Url.Action("Vehiculos","Administrativo")"
+                   class="@(currentController=="Administrativo" && currentAction=="Vehiculos" ? "selected" : "")">
                     <span class="sb-icon">🚗</span>
                     <span class="sb-text">Gestionar Vehículos</span>
                 </a>
+
+                <a href="@Url.Action("ReporteVehiculosPDF","Administrativo")"
+                   class="@(currentController=="Administrativo" && currentAction=="ReporteVehiculosPDF" ? "selected" : "")">
+                    <span class="sb-icon">✔</span>
+                    <span class="sb-text">PDF Vehículos</span>
+                </a>
+
+                <a href="@Url.Action("ReporteUsuariosPDF","Administrativo")"
+                   class="@(currentController=="Administrativo" && currentAction=="ReporteUsuariosPDF" ? "selected" : "")">
+                    <span class="sb-icon">✔</span>
+                    <span class="sb-text">PDF Usuarios</span>
+                </a>
             }
-
-
-
             else if (rol == "VISITANTE")
             {
-                <a href="@Url.Action("Seleccionar","Parqueaderos")" class="@(currentController=="Parqueaderos" ? "selected" : "")">
+                <a href="@Url.Action("Seleccionar","Parqueaderos")"
+                   class="@(currentController=="Parqueaderos" ? "selected" : "")">
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Seleccionar</span>
                 </a>
             }
         }
 
-        @* ===== Salir ===== *@
         <a href="@Url.Action("Logout","Auth")">
             <span class="sb-icon">🚪</span>
             <span class="sb-text">Salir</span>
         </a>
-
     </div>
-
-
-
 
     <main>
         @RenderBody()
     </main>
 
+    <!-- JS Dropdowns / Hovers (ARREGLADO: sin scripts anidados) -->
     <script>
+        // Accesibilidad hover con delay
         (function () {
             var accDD = document.getElementById("accDD");
+            if (!accDD) return;
+
             var closeTimer = null;
 
             function openAcc() {
@@ -444,8 +650,34 @@
             accDD.addEventListener("mouseenter", openAcc);
             accDD.addEventListener("mouseleave", closeAcc);
         })();
+
+        (function () {
+            function setupHover(id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+
+                var t = null;
+                el.addEventListener("mouseenter", function () {
+                    if (t) clearTimeout(t);
+                    el.classList.add("open");
+                });
+                el.addEventListener("mouseleave", function () {
+                    t = setTimeout(function () {
+                        el.classList.remove("open");
+                    }, 700);
+                });
+            }
+
+            setupHover("ddMsg");
+            setupHover("ddHelp");
+            setupHover("ddNotif");
+            setupHover("accDD");
+        })();
     </script>
 
+    <!-- Leaflet JS (antes del section scripts) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    @RenderSection("scripts", required: false)
 </body>
 </html>
-

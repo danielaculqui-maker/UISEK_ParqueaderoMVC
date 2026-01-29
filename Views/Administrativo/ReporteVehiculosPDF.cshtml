@@ -1,0 +1,115 @@
+﻿@model List<UISEK_ParqueaderoMVC.Models.VehiculoAdminDetallesVM>
+@{
+    Layout = null;   // IMPORTANTE: sin layout para PDF
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Reporte de Vehículos</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            color: #000;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            text-align: center;
+            font-size: 11px;
+            margin-bottom: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 6px;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .ok {
+            color: green;
+            font-weight: bold;
+        }
+
+        .off {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Reporte de Vehículos</h2>
+    <div class="sub">
+        SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK<br />
+        Fecha de generación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Placa</th>
+                <th>Tipo</th>
+                <th>Marca / Modelo</th>
+                <th>Origen</th>
+                <th>Propietario</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                var i = 1;
+                foreach (var v in Model)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@v.Placa</td>
+                        <td>@v.Tipo</td>
+                        <td>@(string.IsNullOrWhiteSpace(v.MarcaModelo) ? "-" : v.MarcaModelo)</td>
+                        <td>@v.Origen</td>
+                        <td>@v.Propietario</td>
+                        <td>
+                            @if (v.Activo)
+                            {
+                                <span class="ok">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="off">Inactivo</span>
+                            }
+                        </td>
+                    </tr>
+                    i++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        No existen registros.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>

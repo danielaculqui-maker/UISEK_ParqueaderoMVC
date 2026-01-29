@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+
+@Model List<UISEK_ParqueaderoMVC.Models.UsuarioReporteVM>
+    @{
+        Layout = null;
+    }
+
+    
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Reporte de Usuarios</title>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12px;
+                color: #000;
+            }
+
+            h2 {
+                text-align: center;
+                margin: 0 0 4px;
+            }
+
+            .sub {
+                text-align: center;
+                font-size: 11px;
+                margin-bottom: 12px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th, td {
+                border: 1px solid #333;
+                padding: 6px;
+            }
+
+            th {
+                background: #eee;
+            }
+
+            .ok {
+                color: green;
+                font-weight: bold;
+            }
+
+            .off {
+                color: red;
+                font-weight: bold;
+            }
+
+            .pill {
+                font-size: 11px;
+                padding: 2px 6px;
+                border-radius: 999px;
+                border: 1px solid #333;
+            }
+        </style>
+    </head>
+    <body>
+
+        <h2>Reporte de Usuarios</h2>
+        <div class="sub">
+            SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK<br />
+            Fecha de generación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Origen</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    var i = 1;
+                    foreach (var u in Model)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@u.Nombre</td>
+                            <td>@(string.IsNullOrWhiteSpace(u.Correo) ? "-" : u.Correo)</td>
+                            <td>@u.Rol</td>
+                            <td><span class="pill">@u.Origen</span></td>
+                            <td>
+                                @if (u.Activo)
+                                {<span class="ok">Activo</span> }
+                                else
+                                { <span class="off">Inactivo</span>}
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" style="text-align:center;">No existen registros.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </body>
+</html>

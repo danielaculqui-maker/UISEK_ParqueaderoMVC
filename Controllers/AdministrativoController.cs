@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 using UISEK_ParqueaderoMVC.Models;
+using Rotativa;
+
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -866,6 +868,145 @@ namespace UISEK_ParqueaderoMVC.Controllers
             // ✅ vuelve a detalles del vehículo editado (no pierde el hilo)
             return RedirectToAction("VehiculoDetalles", "Administrativo", new { id = id });
         }
+        // ==========================================================
+        // ✅ REPORTE PDF VEHÍCULOS
+        // ==========================================================
+        [HttpGet]
+        public ActionResult ReporteVehiculosPDF()
+        {
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+            if (rol != "ADMINISTRATIVO")
+                return RedirectToAction("Login", "Auth");
+
+            var lista = ObtenerVehiculosParaReporte();
+
+            return new ViewAsPdf("ReporteVehiculosPDF", lista)
+            {
+                FileName = "Reporte_Vehiculos_UISEK.pdf",
+                PageSize = Rotativa.Options.Size.A4
+            };
+        }
+
+        private List<VehiculoAdminDetallesVM> ObtenerVehiculosParaReporte()
+        {
+            var lista = new List<VehiculoAdminDetallesVM>();
+
+            using (var con = new SqlConnection(CS))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand(@"
+                SELECT * FROM (
+                    SELECT 
+                        v.VehiculoId AS Id, v.Placa, v.Tipo, v.MarcaModelo, v.Activo,
+                        'UISEK' AS Origen,
+                        (u.Nombres + ' ' + u.Apellidos) AS Propietario
+                    FROM dbo.Vehiculos v
+                    INNER JOIN dbo.Usuarios u ON v.UsuarioId = u.UsuarioId
+
+                    UNION ALL
+
+                    SELECT 
+                        vv.VehiculoVisitanteId AS Id, vv.Placa, vv.Tipo, vv.MarcaModelo, vv.Activo,
+                        'VISITANTE' AS Origen,
+                        vi.Nombre AS Propietario
+                    FROM dbo.VehiculosVisitante vv
+                    INNER JOIN dbo.Visitantes vi ON vv.VisitanteId = vi.VisitanteId
+                ) X
+                ORDER BY Activo DESC, Placa ASC;
+            ", con))
+                {
+                    using (var rd = cmd.ExecuteReader())
+                    {
+                        while (rd.Read())
+                        {
+                            lista.Add(new VehiculoAdminDetallesVM
+                            {
+                                Id = Convert.ToInt32(rd["Id"]),
+                                Placa = rd["Placa"].ToString(),
+                                Tipo = rd["Tipo"].ToString(),
+                                MarcaModelo = rd["MarcaModelo"]?.ToString(),
+                                Activo = Convert.ToBoolean(rd["Activo"]),
+                                Origen = rd["Origen"].ToString(),
+                                Propietario = rd["Propietario"]?.ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
+        [HttpGet]
+        public ActionResult ReporteUsuariosPDF()
+        {
+            var rol = (Session["Rol"] as string ?? "").Trim().ToUpper();
+            if (rol != "ADMINISTRATIVO")
+                return RedirectToAction("Login", "Auth");
+
+            var lista = ObtenerUsuariosParaReporte();
+
+            return new Rotativa.ViewAsPdf("ReporteUsuariosPDF", lista)
+            {
+                FileName = "Reporte_Usuarios_UISEK.pdf",
+                PageSize = Rotativa.Options.Size.A4
+            };
+        }
+
+        private List<UISEK_ParqueaderoMVC.Models.UsuarioReporteVM> ObtenerUsuariosParaReporte()
+        {
+            var lista = new List<UISEK_ParqueaderoMVC.Models.UsuarioReporteVM>();
+
+            using (var con = new SqlConnection(CS))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand(@"
+            SELECT * FROM (
+                -- 👤 Usuarios UISEK (NO usamos u.Rol)
+                SELECT 
+                    u.UsuarioId AS Id,
+                    (ISNULL(u.Nombres,'') + ' ' + ISNULL(u.Apellidos,'')) AS Nombre,
+                    ISNULL(u.Correo,'') AS Correo,
+                    'UISEK' AS Rol,             -- ✅ aquí va fijo
+                    u.Activo,
+                    'UISEK' AS Origen
+                FROM dbo.Usuarios u
+
+                UNION ALL
+
+                -- 👤 Visitantes
+                SELECT
+                    v.VisitanteId AS Id,
+                    ISNULL(v.Nombre,'') AS Nombre,
+                    ISNULL(v.CorreoContacto,'') AS Correo,
+                    'VISITANTE' AS Rol,
+                    v.Activo,
+                    'VISITANTE' AS Origen
+                FROM dbo.Visitantes v
+            ) X
+            ORDER BY Activo DESC, Nombre ASC;
+        ", con))
+                {
+                    using (var rd = cmd.ExecuteReader())
+                    {
+                        while (rd.Read())
+                        {
+                            lista.Add(new UISEK_ParqueaderoMVC.Models.UsuarioReporteVM
+                            {
+                                Id = Convert.ToInt32(rd["Id"]),
+                                Nombre = rd["Nombre"].ToString(),
+                                Correo = rd["Correo"].ToString(),
+                                Rol = rd["Rol"].ToString(),
+                                Activo = Convert.ToBoolean(rd["Activo"]),
+                                Origen = rd["Origen"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
+
     }
 }
 

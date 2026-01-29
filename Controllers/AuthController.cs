@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Mvc;
-using UISEK_ParqueaderoMVC.Services; // ✅ NUEVO
+using UISEK_ParqueaderoMVC.Services; // ✅ EmailService
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -59,6 +59,21 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 }
             }
 
+            // ✅ SOLO 2 CORREOS para GUARDIA (ANTES de tocar BD)
+            if (rol == "GUARDIA")
+            {
+                var allowedG = (ConfigurationManager.AppSettings["GuardiaEmails"] ?? "")
+                    .ToLower()
+                    .Split(new[] { ';', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                bool okG = allowedG.Contains(correo.ToLower());
+                if (!okG)
+                {
+                    ViewBag.ErrorLogin = "No autorizado para rol GUARDIA.";
+                    return View();
+                }
+            }
+
             try
             {
                 string connStr = ConfigurationManager
@@ -108,6 +123,10 @@ namespace UISEK_ParqueaderoMVC.Controllers
                     return View();
             }
         }
+
+        /* ============================
+           REGISTRO VISITANTE
+           ============================ */
 
         // GET: /Auth/RegistroVisitante
         [HttpGet]
@@ -221,11 +240,9 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View("RegistroVisitante");
             }
 
-            // ✅ (Opcional) Si quieres notificar al visitante (correoContacto) y al admin:
-            // OJO: si correoContacto está vacío, no se envía al visitante.
+            // ✅ (Opcional) Notificación por correo (proyecto académico)
             try
             {
-                // Admin (simulado → se redirige a CorreoPruebas por tu EmailService)
                 EmailService.EnviarCorreo(
                     "admin@uisekp.edu.ec",
                     "🚗 Ingreso de VISITANTE",
@@ -243,10 +260,10 @@ namespace UISEK_ParqueaderoMVC.Controllers
             }
             catch
             {
-                // No bloqueamos el flujo si falla el correo (proyecto académico)
+                // no bloquea flujo si falla correo
             }
 
-            // 3️⃣ Guardar datos para la confirmación
+            // 3️⃣ Guardar datos para confirmación
             Session["Rol"] = "VISITANTE";
             Session["NombreVisitante"] = nombre;
             Session["CedulaVisitante"] = cedula;
@@ -257,10 +274,9 @@ namespace UISEK_ParqueaderoMVC.Controllers
             Session["TipoVehiculoVisitante"] = tipoVehiculo;
             Session["MarcaModeloVisitante"] = marcaModelo;
 
-            // 4️⃣ Pantalla de confirmación
+            // 4️⃣ Confirmación
             return RedirectToAction("ConfirmacionVisitante", "Auth");
         }
-
 
         /* ============================
            CONFIRMACIÓN VISITANTE

@@ -1,0 +1,173 @@
+﻿@model IEnumerable<UISEK_ParqueaderoMVC.Models.EventoMapa>
+
+    @{
+        ViewBag.Title = "Mapa del Parqueadero";
+    }
+
+    <style>
+
+        #mapa {
+            position: relative;
+        }
+
+            /* Marca de agua SOBRE el mapa */
+            #mapa .uisek-watermark {
+                position: absolute;
+                inset: 0;
+                background: url('/Content/Imagenes/fondo_uisek.png') center center no-repeat;
+                background-size: 380px auto;
+                opacity: 0.06;
+                pointer-events: none;
+                z-index: 1000; /* MÁS que cualquier capa Leaflet */
+            }
+
+        /* En modo oscuro se nota un poco más */
+        body.oscuro #mapa .uisek-watermark {
+            opacity: 0.1;
+        }
+        /* ===== TEXTO SOBRE MAPA EN MODO OSCURO ===== */
+        body.oscuro h2,
+        body.oscuro p,
+        body.oscuro .chip,
+        body.oscuro .chip b {
+            color: #f9fafb !important;
+        }
+
+        /* Chips legibles */
+        body.oscuro .chip {
+            background: rgba(17,24,39,0.95) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+        }
+
+        /* Texto secundario */
+        body.oscuro p {
+            opacity: 0.9 !important;
+        }
+
+
+        .chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,.08);
+            background: #fff;
+            font-size: 13px;
+            box-shadow: 0 6px 14px rgba(0,0,0,.06);
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        #mapa {
+            height: 520px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,.08);
+            overflow: hidden;
+        }
+
+    </style>
+
+    <h2 style="margin-bottom:4px;">🗺️ Mapa del Parqueadero</h2>
+    <p style="margin-top:0; opacity:.75;">Aquí se muestran cupos, bloqueos y alertas en el mapa.</p>
+
+    <div class="chips">
+        <div class="chip">
+            <span class="dot" style="background:#dc3545;"></span>
+            Bloqueos: <b>@Model.Count(e => (e.Tipo ?? "").ToUpper() == "BLOQUEO")</b>
+        </div>
+
+        <div class="chip">
+            <span class="dot" style="background:#198754;"></span>
+            Disponibles: <b>@Model.Count(e => (e.Tipo ?? "").ToUpper() == "DISPONIBLE")</b>
+        </div>
+
+        <div class="chip">
+            <span class="dot" style="background:#fd7e14;"></span>
+            Alertas: <b>@Model.Count(e => (e.Tipo ?? "").ToUpper() == "ALERTA")</b>
+        </div>
+    </div>
+
+    <div id="mapa"></div>
+
+    @section scripts {
+        <script>
+    (function () {
+        // Centro (UISEK Quito aprox)
+        var centro = [-0.1807, -78.4678];
+
+        // Inicializar Leaflet
+        var map = L.map('mapa').setView(centro, 16);
+
+        // Capa OSM (gratis)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Eventos desde el modelo
+        var eventos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+
+        // Si no hay eventos, deja solo el mapa centrado
+        if (!eventos || eventos.length === 0) return;
+
+        var bounds = [];
+
+        eventos.forEach(function (e) {
+
+            // Parse por si vienen como string
+            var lat = parseFloat(e.Latitud);
+            var lng = parseFloat(e.Longitud);
+
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            var tipo = (e.Tipo || "").toUpperCase();
+
+            var color =
+                tipo === "BLOQUEO" ? "#dc3545" :
+                tipo === "DISPONIBLE" ? "#198754" :
+                "#fd7e14"; // ALERTA o default
+
+            // Marcador con círculo de color
+            var mk = L.circleMarker([lat, lng], {
+                radius: 10,
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.85,
+                weight: 2
+            }).addTo(map);
+
+            // Popup
+            var html =
+                "<div style='font-size:13px;line-height:1.25'>" +
+                "<b>" + (e.Titulo || "Evento") + "</b><br/>" +
+                "<span style='opacity:.85'>" + (e.Descripcion || "") + "</span><br/>" +
+                "<span style='opacity:.65'>Tipo: " + (e.Tipo || "") + "</span>" +
+                "</div>";
+
+            mk.bindPopup(html);
+
+            bounds.push([lat, lng]);
+        });
+
+        // Ajustar zoom para ver todos los puntos
+        if (bounds.length > 1) {
+            map.fitBounds(bounds, { padding: [30, 30] });
+        } else if (bounds.length === 1) {
+            map.setView(bounds[0], 17);
+        }
+
+    })();
+        </script>
+    }
