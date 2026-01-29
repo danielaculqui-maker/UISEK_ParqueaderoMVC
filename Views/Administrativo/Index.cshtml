@@ -78,6 +78,30 @@
         margin: 10px 0;
         font-weight: 900;
     }
+
+    /* ======================
+       🌙 MODO OSCURO (FIX)
+       ====================== */
+    body.oscuro .card,
+    body.oscuro .kpi {
+        background: rgba(30,41,59,0.96) !important;
+        border: 1px solid rgba(255,255,255,.12) !important;
+        color: #E5E7EB !important;
+    }
+
+        body.oscuro .kpi .t {
+            color: #CBD5E1 !important;
+        }
+
+    body.oscuro table th {
+        background: rgba(255,255,255,.06) !important;
+        color: #E5E7EB !important;
+    }
+
+    body.oscuro table td {
+        color: #E5E7EB !important;
+        border-bottom: 1px solid rgba(255,255,255,.08) !important;
+    }
 </style>
 
 <h2>📊 Panel Administrativo</h2>
@@ -130,22 +154,63 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(async function(){
-  const res = await fetch('@Url.Action("FlujoPorDiaJson","Administrativo", new { days = 14 })');
-  const data = await res.json();
+(async function () {
+    const res = await fetch('@Url.Action("FlujoPorDiaJson","Administrativo", new { days = 14 })', { cache: "no-store" });
+    const data = await res.json();
 
-  const ctx = document.getElementById('flujoChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: data.labels,
-      datasets: [
-        { label: 'Entradas', data: data.entradas },
-        { label: 'Salidas', data: data.salidas }
-      ]
-    },
-    options: { responsive: true }
-  });
+    const isDark = document.body.classList.contains('oscuro');
+    const textColor = isDark ? '#E5E7EB' : '#374151';
+    const gridColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.10)';
+
+    const ctx = document.getElementById('flujoChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: data.entradas,
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59,130,246,0.18)',
+                    tension: 0.3,
+                    pointRadius: 3
+                },
+                {
+                    label: 'Salidas',
+                    data: data.salidas,
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239,68,68,0.18)',
+                    tension: 0.3,
+                    pointRadius: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: textColor } },
+                tooltip: {
+                    backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                    titleColor: textColor,
+                    bodyColor: textColor,
+                    borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.10)',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: textColor },
+                    grid: { color: gridColor }
+                },
+                y: {
+                    ticks: { color: textColor },
+                    grid: { color: gridColor }
+                }
+            }
+        }
+    });
 })();
 </script>
 
@@ -190,73 +255,36 @@
     }
 </div>
 
-<div class="card">
-    <h3 style="margin:0 0 10px 0;">🔥 Días con mayor flujo (últimos 14 días)</h3>
-
-    @if (Model.TopDiasFlujo == null || Model.TopDiasFlujo.Count == 0)
-    {
-        <div style="color:#6c7a89;font-weight:900;">Sin datos.</div>
-    }
-    else
-    {
-        <table>
-            <thead>
-                <tr>
-                    <th>Día</th>
-                    <th>Entradas</th>
-                    <th>Salidas</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var d in Model.TopDiasFlujo)
-                {
-                    <tr>
-                        <td>@d.Dia.ToString("dd/MM/yyyy")</td>
-                        <td>@d.Entradas</td>
-                        <td>@d.Salidas</td>
-                        <td><b>@d.Total</b></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-</div>
-
-<!-- ✅ AUTO-REFRESH SOLO DEL "DENTRO AHORA" + TABLA -->
 <script>
 async function refrescarDentro() {
-  try {
-    const res = await fetch('@Url.Action("DentroAhoraJson","Administrativo")', { cache: "no-store" });
-    if (!res.ok) return;
-    const data = await res.json();
+    try {
+        const res = await fetch('@Url.Action("DentroAhoraJson","Administrativo")', { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
 
-    // KPI
-    const kpi = document.getElementById("kpiDentro");
-    if (kpi) kpi.textContent = data.dentroAhora;
+        const kpi = document.getElementById("kpiDentro");
+        if (kpi) kpi.textContent = data.dentroAhora;
 
-    // Tabla
-    const tb = document.getElementById("tbDentro");
-    if (!tb) return;
+        const tb = document.getElementById("tbDentro");
+        if (!tb) return;
 
-    tb.innerHTML = "";
-    (data.items || []).forEach(v => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${v.FechaEntrada}</td>
-        <td><b>${v.Placa}</b></td>
-        <td>${v.Tipo}</td>
-        <td>${v.Nombre}</td>
-        <td>${v.Correo}</td>
-        <td>${v.Zona}</td>
-        <td>${v.Fuente}</td>
-      `;
-      tb.appendChild(tr);
-    });
-  } catch (e) { }
+        tb.innerHTML = "";
+        (data.items || []).forEach(v => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${v.FechaEntrada}</td>
+                <td><b>${v.Placa}</b></td>
+                <td>${v.Tipo}</td>
+                <td>${v.Nombre}</td>
+                <td>${v.Correo}</td>
+                <td>${v.Zona}</td>
+                <td>${v.Fuente}</td>
+            `;
+            tb.appendChild(tr);
+        });
+    } catch (e) { }
 }
 
 refrescarDentro();
 setInterval(refrescarDentro, 3000);
 </script>
-

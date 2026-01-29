@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Mvc;
+using UISEK_ParqueaderoMVC.Services; // ✅ NUEVO
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -220,6 +221,31 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View("RegistroVisitante");
             }
 
+            // ✅ (Opcional) Si quieres notificar al visitante (correoContacto) y al admin:
+            // OJO: si correoContacto está vacío, no se envía al visitante.
+            try
+            {
+                // Admin (simulado → se redirige a CorreoPruebas por tu EmailService)
+                EmailService.EnviarCorreo(
+                    "admin@uisekp.edu.ec",
+                    "🚗 Ingreso de VISITANTE",
+                    $"El visitante <b>{nombre}</b> con placa <b>{placa}</b> ha INGRESADO.<br/>Motivo: {motivo}"
+                );
+
+                if (!string.IsNullOrWhiteSpace(correoContacto))
+                {
+                    EmailService.EnviarCorreo(
+                        correoContacto,
+                        "✅ Ingreso confirmado (Visitante)",
+                        $"Hola <b>{nombre}</b>, tu ingreso fue registrado.<br/>Placa: <b>{placa}</b><br/>Motivo: {motivo}"
+                    );
+                }
+            }
+            catch
+            {
+                // No bloqueamos el flujo si falla el correo (proyecto académico)
+            }
+
             // 3️⃣ Guardar datos para la confirmación
             Session["Rol"] = "VISITANTE";
             Session["NombreVisitante"] = nombre;
@@ -234,6 +260,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             // 4️⃣ Pantalla de confirmación
             return RedirectToAction("ConfirmacionVisitante", "Auth");
         }
+
 
         /* ============================
            CONFIRMACIÓN VISITANTE

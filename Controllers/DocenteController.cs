@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 using UISEK_ParqueaderoMVC.Models;
+using UISEK_ParqueaderoMVC.Services; // ✅ NUEVO (EmailService)
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -36,10 +37,12 @@ namespace UISEK_ParqueaderoMVC.Controllers
             if (rol != "DOCENTE") return RedirectToAction("Login", "Auth");
 
             // ✅ Reusar la MISMA vista del estudiante
-            // (si ya te funciona perfecto ahí)
             return RedirectToAction("MiVehiculo", "Estudiante");
         }
 
+        // ==================================================
+        // ✅ SENSORES SIMULADOS + NOTIFICACIONES
+        // ==================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult SimularEntrada(string zona = "Garita Sur")
@@ -61,7 +64,28 @@ namespace UISEK_ParqueaderoMVC.Controllers
             }
 
             InsertarMovimiento(usuarioId, "ENTRADA", zona, "Entrada detectada por sensor simulado", "SENSOR");
-            TempData["MsgHistOk"] = "✅ ENTRADA registrada (sensor simulado).";
+
+            // ✅ ENVIAR CORREOS (docente + admin)
+            try
+            {
+                EmailService.EnviarCorreo(
+                    correo,
+                    "✅ Ingreso confirmado",
+                    "Tu vehículo ha ingresado correctamente al parqueadero."
+                );
+
+                EmailService.EnviarCorreo(
+                    "admin@uisekp.edu.ec",
+                    "🚗 Ingreso de vehículo (Docente)",
+                    $"El docente {correo} ha INGRESADO al parqueadero."
+                );
+            }
+            catch
+            {
+                // No bloqueamos el flujo si falla el correo
+            }
+
+            TempData["MsgHistOk"] = "✅ ENTRADA registrada (sensor simulado) + notificación enviada.";
             return RedirectToAction("Index");
         }
 
@@ -86,7 +110,27 @@ namespace UISEK_ParqueaderoMVC.Controllers
             }
 
             InsertarMovimiento(usuarioId, "SALIDA", zona, "Salida detectada por sensor simulado", "SENSOR");
-            TempData["MsgHistOk"] = "✅ SALIDA registrada (sensor simulado).";
+
+            // ✅ ENVIAR CORREOS (docente + admin)
+            try
+            {
+                EmailService.EnviarCorreo(
+                    correo,
+                    "🚗 Salida registrada",
+                    "Tu vehículo ha salido del parqueadero. Gracias por usar el sistema."
+                );
+
+                EmailService.EnviarCorreo(
+                    "admin@uisekp.edu.ec",
+                    "🚪 Salida de vehículo (Docente)",
+                    $"El docente {correo} ha SALIDO del parqueadero."
+                );
+            }
+            catch
+            {
+            }
+
+            TempData["MsgHistOk"] = "✅ SALIDA registrada (sensor simulado) + notificación enviada.";
             return RedirectToAction("Index");
         }
 
@@ -260,7 +304,6 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 cmd.ExecuteNonQuery();
             }
         }
-
 
         private string InferirEstado(PanelUsuarioVM vm)
         {
