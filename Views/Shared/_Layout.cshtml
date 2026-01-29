@@ -372,29 +372,42 @@
                     <span class="sb-icon">🏠</span>
                     <span class="sb-text">Panel Docente</span>
                 </a>
-            
-        }
-        else if (rol == "GUARDIA")
-        {
-            <a href="@Url.Action("Index","Guardia")" class="@(currentController=="Guardia" ? "selected" : "")">
-                <span class="sb-icon">🏠</span>
-                <span class="sb-text">Panel Guardia</span>
-            </a>
-        }
-        else if (rol == "ADMINISTRATIVO")
-        {
-    <a href="@Url.Action("Index","Administrativo")" class="@(currentController=="Administrativo" ? "selected" : "")">
-        <span class="sb-icon">📊</span>
-        <span class="sb-text">Panel Administrativo</span>
-    </a>
-        }
-        else if (rol == "VISITANTE")
-        {
-            <a href="@Url.Action("Seleccionar","Parqueaderos")" class="@(currentController=="Parqueaderos" ? "selected" : "")">
-                <span class="sb-icon">🏠</span>
-                <span class="sb-text">Seleccionar</span>
-            </a>
-        }
+
+            }
+            else if (rol == "GUARDIA")
+            {
+                <a href="@Url.Action("Index","Guardia")" class="@(currentController=="Guardia" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Panel Guardia</span>
+                </a>
+            }
+            else if (rol == "ADMINISTRATIVO")
+            {
+                <a href="@Url.Action("Index","Administrativo")" class="@(currentController=="Administrativo" ? "selected" : "")">
+                    <span class="sb-icon">📊</span>
+                    <span class="sb-text">Panel Administrativo</span>
+                </a>
+
+                <a href="@Url.Action("Usuarios","Administrativo")" class="@(currentAction=="Usuarios" ? "selected" : "")">
+                    <span class="sb-icon">👥</span>
+                    <span class="sb-text">Gestionar Personas</span>
+                </a>
+
+                <a href="@Url.Action("Vehiculos","Administrativo")" class="@(currentAction=="Vehiculos" ? "selected" : "")">
+                    <span class="sb-icon">🚗</span>
+                    <span class="sb-text">Gestionar Vehículos</span>
+                </a>
+            }
+
+
+
+            else if (rol == "VISITANTE")
+            {
+                <a href="@Url.Action("Seleccionar","Parqueaderos")" class="@(currentController=="Parqueaderos" ? "selected" : "")">
+                    <span class="sb-icon">🏠</span>
+                    <span class="sb-text">Seleccionar</span>
+                </a>
+            }
         }
 
         @* ===== Salir ===== *@

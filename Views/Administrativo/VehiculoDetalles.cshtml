@@ -1,0 +1,193 @@
+﻿@model UISEK_ParqueaderoMVC.Models.VehiculoAdminDetallesVM
+@{
+    ViewBag.Title = "Vehículo - Admin - Detalles";
+}
+
+<style>
+    .fondo-uisek {
+        background: linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)), url('/Content/Imagenes/fondo_uisek.png');
+        background-size: cover;
+        min-height: 100vh;
+        padding: 24px;
+        border-radius: 18px;
+    }
+
+    body.oscuro .fondo-uisek {
+        background: linear-gradient(rgba(15,23,42,.92), rgba(15,23,42,.92)), url('/Content/Imagenes/fondo_uisek.png');
+    }
+
+    body.contraste .fondo-uisek {
+        background: #000;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        max-width: 720px;
+    }
+
+    body.oscuro .card {
+        background: #020617;
+        color: #e5e7eb;
+    }
+
+    body.contraste .card {
+        background: #000;
+        color: #fff;
+        border: 2px solid #fff;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    body.oscuro .row {
+        border-bottom: 1px solid #1e293b;
+    }
+
+    body.contraste .row {
+        border-bottom: 2px solid #fff;
+    }
+
+    .lbl {
+        font-weight: 900;
+        opacity: .9;
+    }
+
+    .val {
+        font-weight: 700;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eef2ff;
+        font-weight: 800;
+        font-size: 12px;
+        margin-left: 8px;
+    }
+
+    body.oscuro .pill {
+        background: #1e293b;
+        color: #e5e7eb;
+    }
+
+    body.contraste .pill {
+        background: #fff;
+        color: #000;
+    }
+
+    .estado-ok {
+        color: #16a34a;
+        font-weight: 900;
+    }
+
+    .estado-off {
+        color: #dc2626;
+        font-weight: 900;
+    }
+
+    body.contraste .estado-ok, body.contraste .estado-off {
+        color: #fff;
+    }
+
+    .acciones {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 900;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        transition: .2s;
+    }
+
+        .btn:hover {
+            transform: scale(1.03);
+        }
+
+    .btn-detalle {
+        background: #e0f2fe;
+        color: #0f172a;
+    }
+
+    .btn-editar {
+        background: #fef9c3;
+        color: #0f172a;
+    }
+
+    .btn-volver {
+        background: #eef2ff;
+        color: #0f172a;
+    }
+
+    body.oscuro .btn-detalle, body.oscuro .btn-volver {
+        background: #1e293b;
+        color: #e5e7eb;
+    }
+
+    body.oscuro .btn-editar {
+        background: #3b2f0b;
+        color: #e5e7eb;
+    }
+
+    body.contraste .btn {
+        background: #fff;
+        color: #000;
+        border: 2px solid #000;
+    }
+</style>
+
+<div class="fondo-uisek">
+    <h2 style="margin-bottom:16px;">👁 Detalles del Vehículo <span class="pill">@Model.Origen</span></h2>
+
+    <div class="card">
+        <div class="row">
+            <div class="lbl">Placa</div>
+            <div class="val">@Model.Placa</div>
+        </div>
+        <div class="row">
+            <div class="lbl">Tipo</div>
+            <div class="val">@Model.Tipo</div>
+        </div>
+        <div class="row">
+            <div class="lbl">Marca / Modelo</div>
+            <div class="val">@Model.MarcaModelo</div>
+        </div>
+        <div class="row" style="border-bottom:none;">
+            <div class="lbl">Estado</div>
+            <div class="val">
+                @if (Model.Activo)
+                {<span class="estado-ok">● Activo</span> }
+                else
+                { <span class="estado-off">● Inactivo</span>}
+            </div>
+        </div>
+
+        <div class="acciones">
+            <a class="btn btn-editar"
+               href="@Url.Action("VehiculoEditar","Administrativo", new { id = Model.Id, origen = Model.Origen })">
+                ✏️ Editar
+            </a>
+
+            <a class="btn btn-volver"
+               href="@Url.Action("Vehiculos","Administrativo")">⬅ Volver</a>
+        </div>
+    </div>
+</div>

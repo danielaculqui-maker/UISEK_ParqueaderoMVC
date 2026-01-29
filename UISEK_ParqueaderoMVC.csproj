@@ -133,10 +133,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AdminDashboardVM.cs" />
+    <Compile Include="Models\AdminUsuarioVM.cs" />
+    <Compile Include="Models\AdminVehiculoVM.cs" />
     <Compile Include="Models\HistorialItemVM.cs" />
     <Compile Include="Models\PanelUsuarioVM.cs" />
     <Compile Include="Models\ReporteDashboard.cs" />
     <Compile Include="Models\UsuarioRow.cs" />
+    <Compile Include="Models\VehiculoAdminDetallesVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EmailService.cs" />
   </ItemGroup>
@@ -189,6 +192,11 @@
     <Content Include="Views\Auth\ConfirmacionVisitante.cshtml" />
     <Content Include="Views\Estudiante\MiVehiculo.cshtml" />
     <Content Include="Views\Docente\MiVehiculo.cshtml" />
+    <Content Include="Views\Administrativo\UsuarioDetalles.cshtml" />
+    <Content Include="Views\Administrativo\UsuarioEditar.cshtml" />
+    <Content Include="Views\Administrativo\Vehiculos.cshtml" />
+    <Content Include="Views\Administrativo\VehiculoDetalles.cshtml" />
+    <Content Include="Views\Administrativo\VehiculoEditar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
