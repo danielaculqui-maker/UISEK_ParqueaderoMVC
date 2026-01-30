@@ -1,288 +1,300 @@
-﻿@model List<UISEK_ParqueaderoMVC.Models.VehiculoAdminDetallesVM>
-@{
-    ViewBag.Title = "Gestión de Vehículos";
-}
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
 
-<style>
-    /* ===============================
-   FIX CONTRASTE MODO OSCURO
-   =============================== */
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
 
-    body.oscuro td,
-    body.oscuro th,
-    body.oscuro .lbl,
-    body.oscuro .val {
-        color: #e5e7eb !important; /* gris claro legible */
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@model List<UISEK_ParqueaderoMVC.Models.VehiculoAdminDetallesVM>
+    @{
+        ViewBag.Title = "Gestión de Vehículos";
     }
 
-    .fondo-uisek {
-        background: linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)), url('/Content/Imagenes/fondo_uisek.png');
-        background-size: cover;
-        min-height: 100vh;
-        padding: 24px;
-        border-radius: 18px;
-    }
+    <style>
+             /* ===============================
+        FIX CONTRASTE MODO OSCURO
+        =============================== */
 
-    body.oscuro .fondo-uisek {
-        background: linear-gradient(rgba(15,23,42,.92), rgba(15,23,42,.92)), url('/Content/Imagenes/fondo_uisek.png');
-    }
+             body.oscuro td,
+             body.oscuro th,
+             body.oscuro .lbl,
+             body.oscuro .val {
+                 color: #e5e7eb !important; 
+             }
 
-    body.contraste .fondo-uisek {
-        background: #000;
-    }
+             .fondo-uisek {
+                 background: linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)), url('/Content/Imagenes/fondo_uisek.png');
+                 background-size: cover;
+                 min-height: 100vh;
+                 padding: 24px;
+                 border-radius: 18px;
+             }
 
-    .card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 18px;
-        box-shadow: 0 10px 25px rgba(0,0,0,.08);
-    }
+             body.oscuro .fondo-uisek {
+                 background: linear-gradient(rgba(15,23,42,.92), rgba(15,23,42,.92)), url('/Content/Imagenes/fondo_uisek.png');
+             }
 
-    body.oscuro .card {
-        background: #020617;
-        color: #e5e7eb;
-    }
+             body.contraste .fondo-uisek {
+                 background: #000;
+             }
 
-    body.contraste .card {
-        background: #000;
-        color: #fff;
-        border: 2px solid #fff;
-    }
+             .card {
+                 background: #ffffff;
+                 border-radius: 16px;
+                 padding: 18px;
+                 box-shadow: 0 10px 25px rgba(0,0,0,.08);
+             }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        overflow: hidden;
-        border-radius: 14px;
-    }
+             body.oscuro .card {
+                 background: #020617;
+                 color: #e5e7eb;
+             }
 
-    th {
-        background: #0f172a;
-        color: white;
-        padding: 12px;
-        text-align: left;
-        font-size: 14px;
-        white-space: nowrap;
-    }
+             body.contraste .card {
+                 background: #000;
+                 color: #fff;
+                 border: 2px solid #fff;
+             }
 
-    body.oscuro th {
-        background: #0b1220;
-    }
+             table {
+                 width: 100%;
+                 border-collapse: collapse;
+                 overflow: hidden;
+                 border-radius: 14px;
+             }
 
-    body.contraste th {
-        background: #000;
-        border-bottom: 2px solid #fff;
-    }
+             th {
+                 background: #0f172a;
+                 color: white;
+                 padding: 12px;
+                 text-align: left;
+                 font-size: 14px;
+                 white-space: nowrap;
+             }
 
-    td {
-        padding: 12px;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 14px;
-        vertical-align: middle;
-        white-space: nowrap;
-    }
+             body.oscuro th {
+                 background: #0b1220;
+             }
 
-    body.oscuro td {
-        border-bottom: 1px solid #1e293b;
-    }
+             body.contraste th {
+                 background: #000;
+                 border-bottom: 2px solid #fff;
+             }
 
-    body.contraste td {
-        border-bottom: 2px solid #fff;
-    }
+             td {
+                 padding: 12px;
+                 border-bottom: 1px solid #e5e7eb;
+                 font-size: 14px;
+                 vertical-align: middle;
+                 white-space: nowrap;
+             }
 
-    tr:hover {
-        background: #f8fafc;
-    }
+             body.oscuro td {
+                 border-bottom: 1px solid #1e293b;
+             }
 
-    body.oscuro tr:hover {
-        background: #0b1220;
-    }
+             body.contraste td {
+                 border-bottom: 2px solid #fff;
+             }
 
-    body.contraste tr:hover {
-        background: #111;
-    }
+             tr:hover {
+                 background: #f8fafc;
+             }
 
-    .acciones {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
+             body.oscuro tr:hover {
+                 background: #0b1220;
+             }
 
-    .btn {
-        padding: 6px 10px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 800;
-        font-size: 13px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: .2s;
-        border: none;
-        cursor: pointer;
-        line-height: 1;
-    }
+             body.contraste tr:hover {
+                 background: #111;
+             }
 
-        .btn:hover {
-            transform: scale(1.05);
-        }
+             .acciones {
+                 display: flex;
+                 gap: 8px;
+                 align-items: center;
+                 flex-wrap: wrap;
+             }
 
-    .btn-detalle {
-        background: #e0f2fe;
-        color: #0f172a;
-    }
+             .btn {
+                 padding: 6px 10px;
+                 border-radius: 10px;
+                 text-decoration: none;
+                 font-weight: 800;
+                 font-size: 13px;
+                 display: inline-flex;
+                 align-items: center;
+                 justify-content: center;
+                 transition: .2s;
+                 border: none;
+                 cursor: pointer;
+                 line-height: 1;
+             }
 
-    .btn-editar {
-        background: #fef9c3;
-        color: #0f172a;
-    }
+                 .btn:hover {
+                     transform: scale(1.05);
+                 }
 
-    .btn-eliminar {
-        background: #fee2e2;
-        color: #0f172a;
-    }
+             .btn-detalle {
+                 background: #e0f2fe;
+                 color: #0f172a;
+             }
 
-    body.oscuro .btn-detalle {
-        background: #1e293b;
-        color: #e5e7eb;
-    }
+             .btn-editar {
+                 background: #fef9c3;
+                 color: #0f172a;
+             }
 
-    body.oscuro .btn-editar {
-        background: #3b2f0b;
-        color: #e5e7eb;
-    }
+             .btn-eliminar {
+                 background: #fee2e2;
+                 color: #0f172a;
+             }
 
-    body.oscuro .btn-eliminar {
-        background: #3b0b0b;
-        color: #e5e7eb;
-    }
+             body.oscuro .btn-detalle {
+                 background: #1e293b;
+                 color: #e5e7eb;
+             }
 
-    body.contraste .btn {
-        background: #fff;
-        color: #000;
-        border: 2px solid #000;
-    }
+             body.oscuro .btn-editar {
+                 background: #3b2f0b;
+                 color: #e5e7eb;
+             }
 
-    .estado-ok {
-        color: #16a34a;
-        font-weight: 900;
-    }
+             body.oscuro .btn-eliminar {
+                 background: #3b0b0b;
+                 color: #e5e7eb;
+             }
 
-    .estado-off {
-        color: #dc2626;
-        font-weight: 900;
-    }
+             body.contraste .btn {
+                 background: #fff;
+                 color: #000;
+                 border: 2px solid #000;
+             }
 
-    body.contraste .estado-ok, body.contraste .estado-off {
-        color: #fff;
-    }
+             .estado-ok {
+                 color: #16a34a;
+                 font-weight: 900;
+             }
 
-    .pill {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        background: #eef2ff;
-        font-weight: 800;
-        font-size: 12px;
-        margin-left: 8px;
-    }
+             .estado-off {
+                 color: #dc2626;
+                 font-weight: 900;
+             }
 
-    body.oscuro .pill {
-        background: #1e293b;
-        color: #e5e7eb;
-    }
+             body.contraste .estado-ok, body.contraste .estado-off {
+                 color: #fff;
+             }
 
-    body.contraste .pill {
-        background: #fff;
-        color: #000;
-    }
+             .pill {
+                 display: inline-block;
+                 padding: 4px 10px;
+                 border-radius: 999px;
+                 background: #eef2ff;
+                 font-weight: 800;
+                 font-size: 12px;
+                 margin-left: 8px;
+             }
 
-    .tabla-wrap {
-        overflow-x: auto;
-        border-radius: 14px;
-    }
-</style>
+             body.oscuro .pill {
+                 background: #1e293b;
+                 color: #e5e7eb;
+             }
 
-<div class="fondo-uisek">
+             body.contraste .pill {
+                 background: #fff;
+                 color: #000;
+             }
 
-    <h2 style="margin-bottom:16px;">🚗 Gestión de Vehículos</h2>
+             .tabla-wrap {
+                 overflow-x: auto;
+                 border-radius: 14px;
+             }
+    </style>
 
-    <div class="card">
-        <div class="tabla-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Placa</th>
-                        <th>Tipo</th>
-                        <th>Marca / Modelo</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+    <div class="fondo-uisek">
 
-                <tbody>
-                    @if (Model != null && Model.Count > 0)
-                    {
-                        foreach (var v in Model)
+        <h2 style="margin-bottom:16px;">🚗 Gestión de Vehículos</h2>
+
+        <div class="card">
+            <div class="tabla-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Tipo</th>
+                            <th>Marca / Modelo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            foreach (var v in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <b>@v.Placa</b>
+                                        <span class="pill">@v.Origen</span>
+                                    </td>
+                                    <td>@v.Tipo</td>
+                                    <td>@(string.IsNullOrWhiteSpace(v.MarcaModelo) ? "-" : v.MarcaModelo)</td>
+                                    <td>
+                                        @if (v.Activo)
+                                        {<span class="estado-ok">● Activo</span> }
+                                        else
+                                        { <span class="estado-off">● Inactivo</span>}
+                                    </td>
+                                    <td>
+                                        <div class="acciones">
+                                           
+                                            <a class="btn btn-detalle"
+                                               href="@Url.Action("VehiculoDetalles","Administrativo", new { id = v.Id, origen = v.Origen })"
+                                               title="Ver detalles">👁</a>
+
+
+
+                                            <a class="btn btn-editar"
+                                               href="@Url.Action("VehiculoEditar","Administrativo", new { id = v.Id, origen = v.Origen })"
+                                               title="Editar">✏️</a>
+
+                                            @using (Html.BeginForm("VehiculoEliminar", "Administrativo", FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@v.Id" />
+                                                <input type="hidden" name="origen" value="@v.Origen" />
+                                                <button type="submit" class="btn btn-eliminar"
+                                                        onclick="return confirm('¿Desactivar este vehículo?');"
+                                                        title="Desactivar">
+                                                    🗑
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td>
-                                    <b>@v.Placa</b>
-                                    <span class="pill">@v.Origen</span>
-                                </td>
-                                <td>@v.Tipo</td>
-                                <td>@(string.IsNullOrWhiteSpace(v.MarcaModelo) ? "-" : v.MarcaModelo)</td>
-                                <td>
-                                    @if (v.Activo)
-                                    {<span class="estado-ok">● Activo</span> }
-                                    else
-                                    { <span class="estado-off">● Inactivo</span>}
-                                </td>
-                                <td>
-                                    <div class="acciones">
-                                        <!-- Si no tienes Detalles/Editar de vehiculos aún, puedes comentar estos 2 -->
-                                        <a class="btn btn-detalle"
-                                           href="@Url.Action("VehiculoDetalles","Administrativo", new { id = v.Id, origen = v.Origen })"
-                                           title="Ver detalles">👁</a>
-
-
-
-                                        <a class="btn btn-editar"
-                                           href="@Url.Action("VehiculoEditar","Administrativo", new { id = v.Id, origen = v.Origen })"
-                                           title="Editar">✏️</a>
-
-                                        @using (Html.BeginForm("VehiculoEliminar", "Administrativo", FormMethod.Post, new { style = "display:inline;" }))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@v.Id" />
-                                            <input type="hidden" name="origen" value="@v.Origen" />
-                                            <button type="submit" class="btn btn-eliminar"
-                                                    onclick="return confirm('¿Desactivar este vehículo?');"
-                                                    title="Desactivar">
-                                                🗑
-                                            </button>
-                                        }
-                                    </div>
+                                <td colspan="5" style="padding:16px; text-align:center; opacity:.8;">
+                                    No hay vehículos registrados.
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" style="padding:16px; text-align:center; opacity:.8;">
-                                No hay vehículos registrados.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:14px;">
+                <a class="btn btn-detalle" href="@Url.Action("Index","Administrativo")">⬅ Volver al panel</a>
+            </div>
         </div>
 
-        <div style="margin-top:14px;">
-            <a class="btn btn-detalle" href="@Url.Action("Index","Administrativo")">⬅ Volver al panel</a>
-        </div>
     </div>
-
-</div>

@@ -1,4 +1,16 @@
-﻿namespace UISEK_ParqueaderoMVC.Models
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+namespace UISEK_ParqueaderoMVC.Models
 {
     public class AdminVehiculoVM
     {

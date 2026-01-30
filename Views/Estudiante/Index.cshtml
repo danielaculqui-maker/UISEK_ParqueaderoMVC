@@ -1,10 +1,22 @@
-﻿@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
+
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
 @{
     ViewBag.Title = "Panel Estudiante";
 }
 
 <style>
-    /* (TODO TU CSS IGUAL, NO TOCADO) */
+    
     .panel-wrap {
         min-height: calc(100vh - 78px);
         padding: 10px 6px;
@@ -374,13 +386,13 @@
 @{
     bool vehiculoRegistrado = !string.IsNullOrWhiteSpace(Model?.Placa);
 
-    // ✅ Estado del sistema (script) viene del controller (SistemaConfig)
+    //  Estado del sistema (script) viene del controller (SistemaConfig)
     bool scriptActivo = (ViewBag.ScriptActivo as bool?) ?? false;
     string estadoSistemaTxt = scriptActivo ? "Activo" : "Inactivo";
     string barraSistema = scriptActivo ? "bar-ok" : "bar-bad";
     string iconoSistema = scriptActivo ? "🟢" : "🔴";
 
-    // ✅ Estado del usuario (tabla Usuarios.Activo)
+    //  Estado del usuario (tabla Usuarios.Activo)
     string estadoUsuarioTxt = (Model?.EstadoActivo ?? false) ? "Activo" : "Inactivo";
     string permisoTxt = (Model?.PermisoVigente ?? false) ? "Vigente" : "No vigente";
     string discTxt = (Model?.TieneDiscapacidad ?? false) ? "Sí" : "No";
@@ -421,7 +433,7 @@
         <!-- Cards de estado -->
         <div class="dash-cards">
 
-            <!-- ✅ NUEVA: Sistema (script) -->
+            <!--  NUEVA: Sistema (script) -->
             <div class="dash-card @barraSistema">
                 <div class="dash-icon">@iconoSistema</div>
                 <div>
@@ -430,7 +442,7 @@
                 </div>
             </div>
 
-            <!-- ✅ Antes decía "Estado", ahora "Usuario" -->
+            <!--  Antes decía "Estado", ahora "Usuario" -->
             <div class="dash-card @barraUsuario">
                 <div class="dash-icon">👤</div>
                 <div>
@@ -476,7 +488,7 @@
 
                 <div class="actions">
                     <a class="btnx btnx-primary" href="@Url.Action("MiVehiculo","Estudiante")">🚗 Editar vehículo</a>
-                   
+
                 </div>
 
                 <div class="muted" style="margin-top:10px;">

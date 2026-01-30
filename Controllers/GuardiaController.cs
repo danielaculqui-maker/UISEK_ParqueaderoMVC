@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Mvc;
@@ -28,7 +40,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ===========================
-        // ✅ REGISTRO NORMAL (solo si SCRIPT_ACTIVO=1)
+        // REGISTRO NORMAL (solo si SCRIPT_ACTIVO=1)
         // ===========================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -66,7 +78,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ===========================
-        // ✅ CONTINGENCIA (solo si SCRIPT_ACTIVO=0)
+        // CONTINGENCIA (solo si SCRIPT_ACTIVO=0)
         // ===========================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -115,7 +127,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ===========================
-        // ✅ CONSOLIDAR (cuando vuelve a activo)
+        // CONSOLIDAR (cuando vuelve a activo)
         // ===========================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -141,7 +153,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ===========================
-        // ✅ Helpers (reusando tu config)
+        // Helpers (reusando tu config)
         // ===========================
         private bool LeerScriptActivo()
         {

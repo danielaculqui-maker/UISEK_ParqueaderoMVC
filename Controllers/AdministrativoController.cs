@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+using System;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -14,8 +26,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         private string CS => ConfigurationManager.ConnectionStrings["UISEK_ParqueaderoDB"].ConnectionString;
 
         // ==========================================================
-        // ✅ DASHBOARD ADMINISTRATIVO
-        // (NO incluye visitantes en KPIs, como decidiste)
+        //DASHBOARD ADMINISTRATIVO
         // ==========================================================
         [HttpGet]
         public ActionResult Index()
@@ -130,7 +141,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             return View(vm);
         }
 
-        // ✅ JSON para gráfica (Chart.js)
+        //  JSON para gráfica (Chart.js)
         [HttpGet]
         public ActionResult FlujoPorDiaJson(int days = 14)
         {
@@ -170,7 +181,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             return Json(new { labels, entradas, salidas }, JsonRequestBehavior.AllowGet);
         }
 
-        // ✅ JSON auto-refresh: Dentro ahora + tabla
+        //  JSON auto-refresh: Dentro ahora + tabla
         [HttpGet]
         public ActionResult DentroAhoraJson()
         {
@@ -227,7 +238,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             return Json(new { dentroAhora = items.Count, items }, JsonRequestBehavior.AllowGet);
         }
 
-        // ✅ Botón activar/desactivar script
+        //  Botón activar/desactivar script
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ToggleScript()
@@ -275,8 +286,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ==========================================================
-        // ✅ GESTIONAR PERSONAS (Usuarios + Visitantes) - LISTA
-        // (Aquí sí aparecen visitantes, como lo dejaste)
+        //  GESTIONAR PERSONAS (Usuarios + Visitantes) - LISTA
         // ==========================================================
         [HttpGet]
         public ActionResult Usuarios()
@@ -333,7 +343,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ==========================================================
-        // 👁 DETALLES (UISEK + VISITANTE)
+        // DETALLES (UISEK + VISITANTE)
         // ==========================================================
         [HttpGet]
         public ActionResult UsuarioDetalles(int? id, string tipo = "UISEK")
@@ -402,7 +412,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
 
         // ==========================================================
-        // ✏️ EDITAR (GET) UISEK + VISITANTE
+        // EDITAR (GET) UISEK + VISITANTE
         // ==========================================================
         [HttpGet]
         public ActionResult UsuarioEditar(int? id, string tipo = "UISEK")
@@ -471,7 +481,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
 
         // ==========================================================
-        // ✏️ EDITAR (POST) UISEK + VISITANTE
+        //  EDITAR (POST) UISEK + VISITANTE
         // ==========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -516,7 +526,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 }
                 else // UISEK
                 {
-                    // Separar nombre en Nombres/Apellidos (simple)
+                    // Separar nombre en Nombres/Apellidos 
                     var full = (vm.Nombre ?? "").Trim();
                     var nombres = full;
                     var apellidos = "";
@@ -555,7 +565,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
 
         // ==========================================================
-        // 🗑 ELIMINAR / DESACTIVAR (POST) UISEK + VISITANTE
+        // ELIMINAR / DESACTIVAR (POST) UISEK + VISITANTE
         // ==========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -591,7 +601,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
             return RedirectToAction("Usuarios");
         }
         // ==========================================================
-        // ✅ LISTADO DE VEHÍCULOS (UISEK + VISITANTES)
+        // LISTADO DE VEHÍCULOS (UISEK + VISITANTES)
         // Ruta: /Administrativo/Vehiculos
         // ==========================================================
         [HttpGet]
@@ -659,7 +669,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ==========================================================
-        // ✅ DETALLES DE VEHÍCULO (UISEK + VISITANTE)
+        // DETALLES DE VEHÍCULO (UISEK + VISITANTE)
         // Ruta: /Administrativo/VehiculoDetalles/1
         // ==========================================================
         [HttpGet]
@@ -732,7 +742,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ==========================================================
-        // ✅ EDITAR VEHÍCULO (GET)
+        // EDITAR VEHÍCULO (GET)
         // /Administrativo/VehiculoEditar?id=1&origen=UISEK
         // ==========================================================
         [HttpGet]
@@ -804,7 +814,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
 
         // ==========================================================
-        // ✅ EDITAR VEHÍCULO (POST)
+        // EDITAR VEHÍCULO (POST)
         // ==========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -865,11 +875,11 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 }
             }
 
-            // ✅ vuelve a detalles del vehículo editado (no pierde el hilo)
+            // vuelve a detalles del vehículo editado (no pierde el hilo)
             return RedirectToAction("VehiculoDetalles", "Administrativo", new { id = id });
         }
         // ==========================================================
-        // ✅ REPORTE PDF VEHÍCULOS
+        // REPORTE PDF VEHÍCULOS
         // ==========================================================
         [HttpGet]
         public ActionResult ReporteVehiculosPDF()

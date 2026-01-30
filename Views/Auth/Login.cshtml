@@ -1,4 +1,16 @@
-﻿@{
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
+
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@{
     ViewBag.Title = "Iniciar sesión";
     Layout = null;
 }
@@ -14,8 +26,8 @@
 
     <style>
         :root {
-            --c-visit: #2aa7b3; /* overlay visitante */
-            --c-inst: #1f6feb; /* overlay institucional */
+            --c-visit: #2aa7b3; 
+            --c-inst: #1f6feb; 
             --radius: 18px;
         }
 
@@ -123,10 +135,11 @@
             color: #6b7280;
             margin-top: 6px;
         }
+
         .check-row {
             display: inline-flex;
             align-items: center;
-            gap: 1px; /* 🔥 más cerca */
+            gap: 1px; 
             margin-top: 10px;
         }
 
@@ -139,7 +152,7 @@
             }
 
             .check-row input[type="checkbox"] {
-                margin: 0 !important; /* 🔥 mata margin-left:auto si existe */
+                margin: 0 !important; 
                 flex: 0 0 auto;
             }
 
@@ -179,7 +192,7 @@
             border: 2px solid #c00;
         }
 
-        /* ===== BOMBITA (FORMA D) ===== */
+        
         .overlay {
             position: absolute;
             top: -70px;
@@ -200,7 +213,7 @@
             overflow: hidden;
         }
 
-        /* contenido centrado bonito */
+        
         .overlay-content {
             max-width: 300px;
             text-align: center;
@@ -231,7 +244,7 @@
             cursor: pointer;
         }
 
-        /* ===== cuando pasa a institucional ===== */
+       
         .shell.is-inst .overlay {
             transform: translateX(100%);
             background: var(--c-inst);
@@ -241,7 +254,7 @@
             border-bottom-left-radius: 280px;
         }
 
-        /* ===== Mini badge ===== */
+       
         .badge {
             display: inline-block;
             padding: 6px 10px;
@@ -587,7 +600,7 @@
     </script>
 
     <!-- ========================= -->
-    <!-- 🔊 BOTÓN LEER -->
+    <!--  BOTÓN LEER -->
     <!-- ========================= -->
     <button onclick="leerPagina()"
             title="Leer pantalla"
@@ -611,7 +624,7 @@
     </button>
 
     <!-- ========================= -->
-    <!-- ⏹️ BOTÓN DETENER -->
+    <!-- BOTÓN DETENER -->
     <!-- ========================= -->
     <button onclick="detenerLectura()"
             title="Detener lectura"
@@ -635,7 +648,7 @@
     </button>
 
     <!-- ========================= -->
-    <!-- 🎧 SCRIPT DE AUDIO -->
+    <!-- SCRIPT DE AUDIO -->
     <!-- ========================= -->
     <script>
         let voces = [];
@@ -655,7 +668,7 @@
         cargarVoces();
         speechSynthesis.onvoiceschanged = cargarVoces;
 
-        /* 🔊 Leer pantalla */
+        /*  Leer pantalla */
         function leerPagina() {
 
             // Lee solo <main> si existe, si no todo
@@ -682,13 +695,13 @@
             speechSynthesis.speak(u);
         }
 
-        /* ⏹️ Detener lectura */
+        /*  Detener lectura */
         function detenerLectura() {
             speechSynthesis.cancel();
             console.log("⏹️ Lectura detenida");
         }
 
-        /* 🎹 Accesos rápidos */
+        /*  Accesos rápidos */
         document.addEventListener("keydown", function (e) {
             if (e.key.toLowerCase() === "l") {
                 leerPagina();          // L = Leer
@@ -698,7 +711,7 @@
             }
         });
 
-        /* 🛑 Detener al cambiar de página */
+        /*  Detener al cambiar de página */
         window.addEventListener("beforeunload", function () {
             speechSynthesis.cancel();
         });

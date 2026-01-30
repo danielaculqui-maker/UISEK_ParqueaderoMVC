@@ -1,4 +1,16 @@
-﻿@{
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
+
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@{
     var correo = (string)Session["Correo"];
     var rol = ((string)Session["Rol"] ?? "").ToUpper();
     var nombreSistema = "SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK";
@@ -294,100 +306,100 @@
                 background: var(--selected) !important;
                 color: #dbeafe !important;
             }
-/* ===== TOP PANELS (💬 ❓ 🔔) ===== */
+        
         header {
             z-index: 300;
         }
 
-/* 🔥 CAMBIO CLAVE: fixed para que no tape el mapa */
-.top-panel {
-    position: fixed;
-    top: 80px;                 /* debajo del header */
-    right: 18px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0,0,0,.12);
-    width: 320px;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 9999;
-}
+        
+        .top-panel {
+            position: fixed;
+            top: 80px; 
+            right: 18px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0,0,0,.12);
+            width: 320px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 9999;
+        }
 
-.top-dd.open .top-panel {
-    display: flex;
-}
+        .top-dd.open .top-panel {
+            display: flex;
+        }
 
-.top-head {
-    background: #111;
-    color: #fff;
-    padding: .65rem .85rem;
-    font-weight: 900;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-}
+        .top-head {
+            background: #111;
+            color: #fff;
+            padding: .65rem .85rem;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
 
-.top-body {
-    max-height: 300px;
-    overflow: auto;
-}
+        .top-body {
+            max-height: 300px;
+            overflow: auto;
+        }
 
-.top-item {
-    padding: .65rem .85rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-}
+        .top-item {
+            padding: .65rem .85rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
 
-.top-item:last-child {
-    border-bottom: none;
-}
+            .top-item:last-child {
+                border-bottom: none;
+            }
 
-.top-muted {
-    padding: .9rem .85rem;
-    font-size: 13px;
-    opacity: .7;
-}
+        .top-muted {
+            padding: .9rem .85rem;
+            font-size: 13px;
+            opacity: .7;
+        }
 
-.badge-mini {
-    min-width: 18px;
-    height: 18px;
-    border-radius: 999px;
-    padding: 0 6px;
-    font-size: 11px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-}
+        .badge-mini {
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            padding: 0 6px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
 
-/* ===== MODO OSCURO (letras visibles SIEMPRE) ===== */
-body.oscuro .top-panel {
-    background: rgba(15,23,42,0.98) !important;
-    border: 1px solid var(--border) !important;
-    box-shadow: 0 12px 30px rgba(0,0,0,.45) !important;
-    color: #f9fafb !important;
-}
+        /* ===== MODO OSCURO (letras visibles SIEMPRE) ===== */
+        body.oscuro .top-panel {
+            background: rgba(15,23,42,0.98) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,.45) !important;
+            color: #f9fafb !important;
+        }
 
-body.oscuro .top-head {
-    background: #020617 !important;
-    color: #fff !important;
-}
+        body.oscuro .top-head {
+            background: #020617 !important;
+            color: #fff !important;
+        }
 
-body.oscuro .top-item {
-    color: #e5e7eb !important;
-    border-bottom: 1px solid var(--border) !important;
-}
+        body.oscuro .top-item {
+            color: #e5e7eb !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
 
-body.oscuro .top-muted {
-    color: #cbd5e1 !important;
-    opacity: 1 !important;
-}
+        body.oscuro .top-muted {
+            color: #cbd5e1 !important;
+            opacity: 1 !important;
+        }
 
-/
-}
+        /
+        }
 
 
         @@media (max-width:700px) {
@@ -419,7 +431,7 @@ body.oscuro .top-muted {
 
         <div class="right">
 
-            <!-- 💬 Mensajes -->
+           
             <div class="top-dd" id="ddMsg">
                 <div class="icons-header" title="Mensajes">💬</div>
 
@@ -450,7 +462,7 @@ body.oscuro .top-muted {
                 </div>
             </div>
 
-            <!-- ❓ Ayuda -->
+            
             <div class="top-dd" id="ddHelp">
                 <div class="icons-header" title="Ayuda">❓</div>
 
@@ -479,7 +491,7 @@ body.oscuro .top-muted {
                 </div>
             </div>
 
-            <!-- 🔔 Notificaciones -->
+           
             <div class="top-dd" id="ddNotif">
                 <div class="icons-header" title="Notificaciones">🔔</div>
 
@@ -510,7 +522,7 @@ body.oscuro .top-muted {
                 </div>
             </div>
 
-            <!-- Accesibilidad -->
+            
             <div class="acc-dd" id="accDD">
                 <div class="icons-header" title="Accesibilidad">♿</div>
                 <div class="acc-panel">
@@ -681,7 +693,7 @@ body.oscuro .top-muted {
     @RenderSection("scripts", required: false)
 
     <!-- ========================= -->
-    <!-- 🔊 BOTÓN LEER -->
+    <!-- BOTÓN LEER -->
     <!-- ========================= -->
     <button onclick="leerPagina()"
             title="Leer pantalla"
@@ -705,7 +717,7 @@ body.oscuro .top-muted {
     </button>
 
     <!-- ========================= -->
-    <!-- ⏹️ BOTÓN DETENER -->
+    <!-- BOTÓN DETENER -->
     <!-- ========================= -->
     <button onclick="detenerLectura()"
             title="Detener lectura"
@@ -729,13 +741,13 @@ body.oscuro .top-muted {
     </button>
 
     <!-- ========================= -->
-    <!-- 🎧 SCRIPT DE AUDIO -->
+    <!-- SCRIPT DE AUDIO -->
     <!-- ========================= -->
     <script>
         let voces = [];
         let vozES = null;
 
-        /* Cargar voces del navegador */
+        
         function cargarVoces() {
             voces = speechSynthesis.getVoices() || [];
             vozES =
@@ -749,7 +761,7 @@ body.oscuro .top-muted {
         cargarVoces();
         speechSynthesis.onvoiceschanged = cargarVoces;
 
-        /* 🔊 Leer pantalla */
+        /*  Leer pantalla */
         function leerPagina() {
 
             // Lee solo <main> si existe, si no todo
@@ -776,13 +788,13 @@ body.oscuro .top-muted {
             speechSynthesis.speak(u);
         }
 
-        /* ⏹️ Detener lectura */
+        /*  Detener lectura */
         function detenerLectura() {
             speechSynthesis.cancel();
             console.log("⏹️ Lectura detenida");
         }
 
-        /* 🎹 Accesos rápidos */
+        /*  Accesos rápidos */
         document.addEventListener("keydown", function (e) {
             if (e.key.toLowerCase() === "l") {
                 leerPagina();          // L = Leer
@@ -792,7 +804,7 @@ body.oscuro .top-muted {
             }
         });
 
-        /* 🛑 Detener al cambiar de página */
+        /*  Detener al cambiar de página */
         window.addEventListener("beforeunload", function () {
             speechSynthesis.cancel();
         });

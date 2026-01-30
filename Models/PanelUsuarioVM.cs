@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+using System;
 using System.Collections.Generic;
 
 namespace UISEK_ParqueaderoMVC.Models
@@ -29,7 +41,7 @@ namespace UISEK_ParqueaderoMVC.Models
         public string MarcaModelo { get; set; }
 
         // ==========================
-        // ✅ FILTROS PARA HISTORIAL
+        // FILTROS PARA HISTORIAL
         // ==========================
         // Historial
         public List<MovimientoVM> Historial { get; set; } = new List<MovimientoVM>();

@@ -1,196 +1,208 @@
-﻿@model UISEK_ParqueaderoMVC.Models.AdminUsuarioDetallesVM
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
+
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@model UISEK_ParqueaderoMVC.Models.AdminUsuarioDetallesVM
 @{
     ViewBag.Title = "Detalles del Usuario";
 }
 
 <style>
 
-    /* ===============================
-   FIX CONTRASTE MODO OSCURO
-   =============================== */
+     /* ===============================
+    FIX CONTRASTE MODO OSCURO
+    =============================== */
 
-    body.oscuro td,
-    body.oscuro th,
-    body.oscuro .lbl,
-    body.oscuro .val {
-        color: #e5e7eb !important; /* gris claro legible */
-    }
+     body.oscuro td,
+     body.oscuro th,
+     body.oscuro .lbl,
+     body.oscuro .val {
+         color: #e5e7eb !important; /* gris claro legible */
+     }
 
-    /* =============================
-       CONTENEDOR GENERAL
-       ============================= */
-    .fondo-uisek {
-        background: linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)), url('/Content/Imagenes/fondo_uisek.png');
-        background-size: cover;
-        background-position: center;
-        min-height: 100vh;
-        padding: 24px;
-        border-radius: 18px;
-    }
+     /* =============================
+        CONTENEDOR GENERAL
+        ============================= */
+     .fondo-uisek {
+         background: linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)), url('/Content/Imagenes/fondo_uisek.png');
+         background-size: cover;
+         background-position: center;
+         min-height: 100vh;
+         padding: 24px;
+         border-radius: 18px;
+     }
 
-    body.oscuro .fondo-uisek {
-        background: linear-gradient(rgba(15,23,42,.92), rgba(15,23,42,.92)), url('/Content/Imagenes/fondo_uisek.png');
-    }
+     body.oscuro .fondo-uisek {
+         background: linear-gradient(rgba(15,23,42,.92), rgba(15,23,42,.92)), url('/Content/Imagenes/fondo_uisek.png');
+     }
 
-    body.contraste .fondo-uisek {
-        background: #000;
-    }
+     body.contraste .fondo-uisek {
+         background: #000;
+     }
 
-    /* =============================
-       CARD
-       ============================= */
-    .card {
-        background: #ffffff;
-        border-radius: 18px;
-        padding: 22px;
-        box-shadow: 0 10px 25px rgba(0,0,0,.10);
-        max-width: 880px;
-    }
+     /* =============================
+        CARD
+        ============================= */
+     .card {
+         background: #ffffff;
+         border-radius: 18px;
+         padding: 22px;
+         box-shadow: 0 10px 25px rgba(0,0,0,.10);
+         max-width: 880px;
+     }
 
-    body.oscuro .card {
-        background: #020617;
-        color: #e5e7eb;
-    }
+     body.oscuro .card {
+         background: #020617;
+         color: #e5e7eb;
+     }
 
-    body.contraste .card {
-        background: #000;
-        color: #fff;
-        border: 2px solid #fff;
-    }
+     body.contraste .card {
+         background: #000;
+         color: #fff;
+         border: 2px solid #fff;
+     }
 
-    /* =============================
-       TÍTULO
-       ============================= */
-    .title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 16px;
-    }
+     /* =============================
+        TÍTULO
+        ============================= */
+     .title {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         margin-bottom: 16px;
+     }
 
-        .title h2 {
-            margin: 0;
-            font-size: 22px;
-            color: #0f172a;
-        }
+         .title h2 {
+             margin: 0;
+             font-size: 22px;
+             color: #0f172a;
+         }
 
-    body.oscuro .title h2,
-    body.contraste .title h2 {
-        color: #fff;
-    }
+     body.oscuro .title h2,
+     body.contraste .title h2 {
+         color: #fff;
+     }
 
-    .pill {
-        padding: 4px 12px;
-        border-radius: 999px;
-        background: #eef2ff;
-        font-weight: 900;
-        font-size: 12px;
-    }
+     .pill {
+         padding: 4px 12px;
+         border-radius: 999px;
+         background: #eef2ff;
+         font-weight: 900;
+         font-size: 12px;
+     }
 
-    body.oscuro .pill {
-        background: #1e293b;
-        color: #e5e7eb;
-    }
+     body.oscuro .pill {
+         background: #1e293b;
+         color: #e5e7eb;
+     }
 
-    body.contraste .pill {
-        background: #fff;
-        color: #000;
-    }
+     body.contraste .pill {
+         background: #fff;
+         color: #000;
+     }
 
-    /* =============================
-       GRID INFO
-       ============================= */
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 14px;
-    }
+     /* =============================
+        GRID INFO
+        ============================= */
+     .grid {
+         display: grid;
+         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+         gap: 14px;
+     }
 
-    .item {
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 12px;
-    }
+     .item {
+         background: #f8fafc;
+         border: 1px solid #e5e7eb;
+         border-radius: 14px;
+         padding: 12px;
+     }
 
-    body.oscuro .item {
-        background: #020617;
-        border-color: #1e293b;
-    }
+     body.oscuro .item {
+         background: #020617;
+         border-color: #1e293b;
+     }
 
-    body.contraste .item {
-        background: #000;
-        border: 2px solid #fff;
-    }
+     body.contraste .item {
+         background: #000;
+         border: 2px solid #fff;
+     }
 
-    .label {
-        font-size: 12px;
-        font-weight: 900;
-        color: #64748b;
-        margin-bottom: 4px;
-    }
+     .label {
+         font-size: 12px;
+         font-weight: 900;
+         color: #64748b;
+         margin-bottom: 4px;
+     }
 
-    body.oscuro .label {
-        color: #94a3b8;
-    }
+     body.oscuro .label {
+         color: #94a3b8;
+     }
 
-    body.contraste .label {
-        color: #fff;
-    }
+     body.contraste .label {
+         color: #fff;
+     }
 
-    .value {
-        font-size: 15px;
-        font-weight: 800;
-        color: #0f172a;
-        word-break: break-word;
-    }
+     .value {
+         font-size: 15px;
+         font-weight: 800;
+         color: #0f172a;
+         word-break: break-word;
+     }
 
-    body.oscuro .value,
-    body.contraste .value {
-        color: #fff;
-    }
+     body.oscuro .value,
+     body.contraste .value {
+         color: #fff;
+     }
 
-    /* =============================
-       ESTADOS
-       ============================= */
-    .estado-ok {
-        color: #16a34a;
-        font-weight: 900;
-    }
+     /* =============================
+        ESTADOS
+        ============================= */
+     .estado-ok {
+         color: #16a34a;
+         font-weight: 900;
+     }
 
-    .estado-off {
-        color: #dc2626;
-        font-weight: 900;
-    }
+     .estado-off {
+         color: #dc2626;
+         font-weight: 900;
+     }
 
-    body.contraste .estado-ok,
-    body.contraste .estado-off {
-        color: #fff;
-    }
+     body.contraste .estado-ok,
+     body.contraste .estado-off {
+         color: #fff;
+     }
 
-    /* =============================
-       BOTÓN
-       ============================= */
-    .btn-volver {
-        display: inline-block;
-        margin-top: 18px;
-        padding: 8px 14px;
-        border-radius: 10px;
-        background: #e0f2fe;
-        font-weight: 900;
-        text-decoration: none;
-        color: #0f172a;
-    }
+     /* =============================
+        BOTÓN
+        ============================= */
+     .btn-volver {
+         display: inline-block;
+         margin-top: 18px;
+         padding: 8px 14px;
+         border-radius: 10px;
+         background: #e0f2fe;
+         font-weight: 900;
+         text-decoration: none;
+         color: #0f172a;
+     }
 
-    body.oscuro .btn-volver {
-        background: #1e293b;
-        color: #e5e7eb;
-    }
+     body.oscuro .btn-volver {
+         background: #1e293b;
+         color: #e5e7eb;
+     }
 
-    body.contraste .btn-volver {
-        background: #fff;
-        color: #000;
-    }
+     body.contraste .btn-volver {
+         background: #fff;
+         color: #000;
+     }
 </style>
 
 <div class="fondo-uisek">

@@ -1,10 +1,22 @@
-﻿using System;
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Mvc;
-using UISEK_ParqueaderoMVC.Services; // ✅ EmailService
+using UISEK_ParqueaderoMVC.Services; 
 
 namespace UISEK_ParqueaderoMVC.Controllers
 {
@@ -30,21 +42,21 @@ namespace UISEK_ParqueaderoMVC.Controllers
             rol = (rol ?? "").Trim().ToUpper();
             bool discapacidad = tieneDiscapacidad ?? false;
 
-            // ✅ Validar dominio
+            // Validar dominio
             if (string.IsNullOrWhiteSpace(correo) || !correo.EndsWith("@uisekp.edu.ec"))
             {
                 ViewBag.ErrorLogin = "Debe usar un correo institucional con dominio @uisekp.edu.ec";
                 return View();
             }
 
-            // ✅ Validar rol
+            // Validar rol
             if (string.IsNullOrWhiteSpace(rol))
             {
                 ViewBag.ErrorLogin = "Seleccione un rol.";
                 return View();
             }
 
-            // ✅ SOLO 2 CORREOS para ADMINISTRATIVO (ANTES de tocar BD)
+            // SOLO 2 CORREOS para ADMINISTRATIVO (ANTES de tocar BD)
             if (rol == "ADMINISTRATIVO")
             {
                 var allowed = (ConfigurationManager.AppSettings["AdminEmails"] ?? "")
@@ -59,7 +71,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 }
             }
 
-            // ✅ SOLO 2 CORREOS para GUARDIA (ANTES de tocar BD)
+            // SOLO 2 CORREOS para GUARDIA (ANTES de tocar BD)
             if (rol == "GUARDIA")
             {
                 var allowedG = (ConfigurationManager.AppSettings["GuardiaEmails"] ?? "")
@@ -105,12 +117,12 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View();
             }
 
-            // ✅ Sesión
+            // Sesión
             Session["Correo"] = correo;
             Session["Rol"] = rol;
             Session["TieneDiscapacidad"] = discapacidad;
 
-            // ✅ Redirección por rol
+            // Redirección por rol
             switch (rol)
             {
                 case "ESTUDIANTE": return RedirectToAction("MiVehiculo", "Estudiante");
@@ -142,8 +154,8 @@ namespace UISEK_ParqueaderoMVC.Controllers
             string nombre,
             string cedula,
             string placa,
-            string tipoVehiculo,   // ✅ NUEVO
-            string marcaModelo,    // ✅ NUEVO
+            string tipoVehiculo,   
+            string marcaModelo,    
             string correoContacto,
             string motivo,
             int duracionHoras,
@@ -167,11 +179,11 @@ namespace UISEK_ParqueaderoMVC.Controllers
             motivo = motivo.Trim();
             correoContacto = (correoContacto ?? "").Trim();
 
-            // ✅ Normalizar tipo + marca
+            //  Normalizar tipo + marca
             tipoVehiculo = (tipoVehiculo ?? "AUTO").Trim().ToUpper();
             marcaModelo = (marcaModelo ?? "").Trim();
 
-            // ✅ Validar tipo permitido
+            // Validar tipo permitido
             string[] tiposValidos = { "AUTO", "MOTO", "FURGONETA", "ELECTRICO" };
             if (!tiposValidos.Contains(tipoVehiculo))
                 tipoVehiculo = "AUTO";
@@ -185,7 +197,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 {
                     cn.Open();
 
-                    // 1️⃣ Registrar visitante (Upsert por cédula)
+                    //  Registrar visitante (Upsert por cédula)
                     using (SqlCommand cmd = new SqlCommand("dbo.sp_RegistrarVisitante", cn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
@@ -194,7 +206,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                         cmd.Parameters.AddWithValue("@cedula", cedula);
                         cmd.Parameters.AddWithValue("@placa", placa);
 
-                        // ✅ NUEVOS PARAMS
+                        //  NUEVOS PARAMS
                         cmd.Parameters.AddWithValue("@tipo", tipoVehiculo);
                         cmd.Parameters.AddWithValue("@marcaModelo",
                             string.IsNullOrWhiteSpace(marcaModelo) ? (object)DBNull.Value : marcaModelo);
@@ -223,7 +235,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                         }
                     }
 
-                    // 2️⃣ Registrar INGRESO (sensor simulado)
+                    //  Registrar INGRESO (sensor simulado)
                     using (SqlCommand cmdIng = new SqlCommand("dbo.sp_RegistrarIngresoVisitante", cn))
                     {
                         cmdIng.CommandType = CommandType.StoredProcedure;
@@ -240,7 +252,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 return View("RegistroVisitante");
             }
 
-            // ✅ (Opcional) Notificación por correo (proyecto académico)
+            //  (Opcional) Notificación por correo (proyecto académico)
             try
             {
                 EmailService.EnviarCorreo(
@@ -263,18 +275,18 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 // no bloquea flujo si falla correo
             }
 
-            // 3️⃣ Guardar datos para confirmación
+            //  Guardar datos para confirmación
             Session["Rol"] = "VISITANTE";
             Session["NombreVisitante"] = nombre;
             Session["CedulaVisitante"] = cedula;
             Session["PlacaVisitante"] = placa;
             Session["MotivoVisitante"] = motivo;
 
-            // ✅ NUEVO
+            //  NUEVO
             Session["TipoVehiculoVisitante"] = tipoVehiculo;
             Session["MarcaModeloVisitante"] = marcaModelo;
 
-            // 4️⃣ Confirmación
+            //  Confirmación
             return RedirectToAction("ConfirmacionVisitante", "Auth");
         }
 

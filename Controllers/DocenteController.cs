@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Mvc;
@@ -40,12 +52,12 @@ namespace UISEK_ParqueaderoMVC.Controllers
             if (string.IsNullOrWhiteSpace(correo)) return RedirectToAction("Login", "Auth");
             if (rol != "DOCENTE") return RedirectToAction("Login", "Auth");
 
-            // ✅ Reusar la MISMA vista del estudiante
+            // Reusar la MISMA vista del estudiante
             return RedirectToAction("MiVehiculo", "Estudiante");
         }
 
         // ==================================================
-        // ✅ SENSORES SIMULADOS + NOTIFICACIONES
+        // SENSORES SIMULADOS + NOTIFICACIONES
         // ==================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -69,7 +81,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
             InsertarMovimiento(usuarioId, "ENTRADA", zona, "Entrada detectada por sensor simulado", "SENSOR");
 
-            // ✅ ENVIAR CORREOS (docente + admin)
+            //  ENVIAR CORREOS (docente + admin)
             try
             {
                 EmailService.EnviarCorreo(
@@ -115,7 +127,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
             InsertarMovimiento(usuarioId, "SALIDA", zona, "Salida detectada por sensor simulado", "SENSOR");
 
-            // ✅ ENVIAR CORREOS (docente + admin)
+            //  ENVIAR CORREOS (docente + admin)
             try
             {
                 EmailService.EnviarCorreo(
@@ -361,7 +373,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
                 }
             };
 
-            // ✅ Vista compartida (la misma que Estudiante)
+            //  Vista compartida (la misma que Estudiante)
             return View("~/Views/Shared/Mapa.cshtml", eventos);
         }
 

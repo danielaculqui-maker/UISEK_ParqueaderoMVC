@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* ============================================================
+ NOMBRE DEL PROYECTO:
+ SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+ CREADO POR:
+ Daniela Culqui
+ Alberto Andrade
+ Cristian Tenorio
+
+ FECHA DE ENTREGA:
+ 29/01/2026
+============================================================ */
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.Mvc;
@@ -187,12 +199,12 @@ namespace UISEK_ParqueaderoMVC.Controllers
         [HttpGet]
         public ActionResult Mapa()
         {
-            // ✅ Seguridad básica
+            // Seguridad básica
             var correo = (Session["Correo"] as string ?? "").Trim().ToLower();
             if (string.IsNullOrWhiteSpace(correo))
                 return RedirectToAction("Login", "Auth");
 
-            // ✅ Simulado (puedes luego reemplazar por BD)
+            // Simulado (puedes luego reemplazar por BD)
             var eventos = new List<EventoMapa>
     {
         new EventoMapa{
@@ -224,12 +236,12 @@ namespace UISEK_ParqueaderoMVC.Controllers
         }
     };
 
-            // ✅ Usa la vista compartida
+            // Usa la vista compartida
             return View("~/Views/Shared/Mapa.cshtml", eventos);
         }
 
         // ==================================================
-        // ✅ SENSORES SIMULADOS + NOTIFICACIONES
+        // SENSORES SIMULADOS + NOTIFICACIONES
         // ==================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -252,7 +264,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
             InsertarMovimiento(usuarioId, "ENTRADA", zona, "Entrada detectada por sensor simulado", "SENSOR");
 
-            // ✅ ENVIAR CORREOS (usuario + admin)
+            //  ENVIAR CORREOS (usuario + admin)
             try
             {
                 EmailService.EnviarCorreo(
@@ -297,7 +309,7 @@ namespace UISEK_ParqueaderoMVC.Controllers
 
             InsertarMovimiento(usuarioId, "SALIDA", zona, "Salida detectada por sensor simulado", "SENSOR");
 
-            // ✅ ENVIAR CORREOS (usuario + admin)
+            //  ENVIAR CORREOS (usuario + admin)
             try
             {
                 EmailService.EnviarCorreo(

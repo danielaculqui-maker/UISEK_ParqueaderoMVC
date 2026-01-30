@@ -1,4 +1,16 @@
-﻿@model IEnumerable<UISEK_ParqueaderoMVC.Models.EventoMapa>
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
+
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@model IEnumerable<UISEK_ParqueaderoMVC.Models.EventoMapa>
 
     @{
         ViewBag.Title = "Mapa del Parqueadero";
@@ -10,7 +22,7 @@
             position: relative;
         }
 
-            /* Marca de agua SOBRE el mapa */
+            
             #mapa .uisek-watermark {
                 position: absolute;
                 inset: 0;
@@ -18,14 +30,14 @@
                 background-size: 380px auto;
                 opacity: 0.06;
                 pointer-events: none;
-                z-index: 1000; /* MÁS que cualquier capa Leaflet */
+                z-index: 1000; 
             }
 
-        /* En modo oscuro se nota un poco más */
+        
         body.oscuro #mapa .uisek-watermark {
             opacity: 0.1;
         }
-        /* ===== TEXTO SOBRE MAPA EN MODO OSCURO ===== */
+        
         body.oscuro h2,
         body.oscuro p,
         body.oscuro .chip,
@@ -33,13 +45,13 @@
             color: #f9fafb !important;
         }
 
-        /* Chips legibles */
+        
         body.oscuro .chip {
             background: rgba(17,24,39,0.95) !important;
             border: 1px solid rgba(255,255,255,0.15) !important;
         }
 
-        /* Texto secundario */
+        
         body.oscuro p {
             opacity: 0.9 !important;
         }
@@ -77,7 +89,6 @@
             border: 1px solid rgba(0,0,0,.08);
             overflow: hidden;
         }
-
     </style>
 
     <h2 style="margin-bottom:4px;">🗺️ Mapa del Parqueadero</h2>

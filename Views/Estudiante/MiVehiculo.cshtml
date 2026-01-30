@@ -1,7 +1,19 @@
-﻿@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
+
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
+
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@model UISEK_ParqueaderoMVC.Models.PanelUsuarioVM
 @{
     ViewBag.Title = "Mi Vehículo";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // ✅ usa tu layout
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
 
     var nombreCompleto =
         (Model?.NombreCompleto
@@ -16,7 +28,7 @@
 
 <style>
     /* ===========================
-       🎓 FONDO UISEK – MI VEHÍCULO
+        FONDO UISEK – MI VEHÍCULO
        =========================== */
 
     .page-uisek-bg {
@@ -360,7 +372,7 @@
                         <input name="cedula" class="inp" required value="@(Model?.Cedula ?? "")" placeholder="Ej: 1711111111" />
                     </div>
 
-                    <!-- ✅ Discapacidad fuera -->
+                    <!--  Discapacidad fuera -->
 
                     <button type="submit" class="btnx primary" style="width:100%;">✅ Actualizar datos</button>
 

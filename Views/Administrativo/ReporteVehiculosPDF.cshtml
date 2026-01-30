@@ -1,115 +1,127 @@
-﻿@model List<UISEK_ParqueaderoMVC.Models.VehiculoAdminDetallesVM>
-@{
-    Layout = null;   // IMPORTANTE: sin layout para PDF
-}
+﻿@* ============================================================
+    NOMBRE DEL PROYECTO:
+    SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Reporte de Vehículos</title>
+    CREADO POR:
+    Daniela Culqui
+    Alberto Andrade
+    Cristian Tenorio
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 12px;
-            color: #000;
-        }
+    FECHA DE ENTREGA:
+    29/01/2026
+    ============================================================ *@
+@model List<UISEK_ParqueaderoMVC.Models.VehiculoAdminDetallesVM>
+    @{
+        Layout = null;   // IMPORTANTE: sin layout para PDF
+    }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 4px;
-        }
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Reporte de Vehículos</title>
 
-        .sub {
-            text-align: center;
-            font-size: 11px;
-            margin-bottom: 12px;
-        }
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12px;
+                color: #000;
+            }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+            h2 {
+                text-align: center;
+                margin-bottom: 4px;
+            }
 
-        th, td {
-            border: 1px solid #333;
-            padding: 6px;
-        }
+            .sub {
+                text-align: center;
+                font-size: 11px;
+                margin-bottom: 12px;
+            }
 
-        th {
-            background: #eee;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-        .ok {
-            color: green;
-            font-weight: bold;
-        }
+            th, td {
+                border: 1px solid #333;
+                padding: 6px;
+            }
 
-        .off {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
-</head>
+            th {
+                background: #eee;
+            }
 
-<body>
+            .ok {
+                color: green;
+                font-weight: bold;
+            }
 
-    <h2>Reporte de Vehículos</h2>
-    <div class="sub">
-        SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK<br />
-        Fecha de generación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
-    </div>
+            .off {
+                color: red;
+                font-weight: bold;
+            }
+        </style>
+    </head>
 
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Placa</th>
-                <th>Tipo</th>
-                <th>Marca / Modelo</th>
-                <th>Origen</th>
-                <th>Propietario</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Count > 0)
-            {
-                var i = 1;
-                foreach (var v in Model)
+    <body>
+
+        <h2>Reporte de Vehículos</h2>
+        <div class="sub">
+            SISTEMA INTELIGENTE DE CONTROL DE PARQUEADEROS UISEK<br />
+            Fecha de generación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Marca / Modelo</th>
+                    <th>Origen</th>
+                    <th>Propietario</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    var i = 1;
+                    foreach (var v in Model)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@v.Placa</td>
+                            <td>@v.Tipo</td>
+                            <td>@(string.IsNullOrWhiteSpace(v.MarcaModelo) ? "-" : v.MarcaModelo)</td>
+                            <td>@v.Origen</td>
+                            <td>@v.Propietario</td>
+                            <td>
+                                @if (v.Activo)
+                                {
+                                    <span class="ok">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="off">Inactivo</span>
+                                }
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@i</td>
-                        <td>@v.Placa</td>
-                        <td>@v.Tipo</td>
-                        <td>@(string.IsNullOrWhiteSpace(v.MarcaModelo) ? "-" : v.MarcaModelo)</td>
-                        <td>@v.Origen</td>
-                        <td>@v.Propietario</td>
-                        <td>
-                            @if (v.Activo)
-                            {
-                                <span class="ok">Activo</span>
-                            }
-                            else
-                            {
-                                <span class="off">Inactivo</span>
-                            }
+                        <td colspan="7" style="text-align:center;">
+                            No existen registros.
                         </td>
                     </tr>
-                    i++;
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="7" style="text-align:center;">
-                        No existen registros.
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-</body>
+    </body>
 </html>
