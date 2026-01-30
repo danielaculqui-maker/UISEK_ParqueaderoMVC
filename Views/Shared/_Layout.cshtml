@@ -679,5 +679,125 @@ body.oscuro .top-muted {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     @RenderSection("scripts", required: false)
+
+    <!-- ========================= -->
+    <!-- 🔊 BOTÓN LEER -->
+    <!-- ========================= -->
+    <button onclick="leerPagina()"
+            title="Leer pantalla"
+            aria-label="Leer pantalla"
+            style="
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,0,0,.25);
+        ">
+        🔊
+    </button>
+
+    <!-- ========================= -->
+    <!-- ⏹️ BOTÓN DETENER -->
+    <!-- ========================= -->
+    <button onclick="detenerLectura()"
+            title="Detener lectura"
+            aria-label="Detener lectura"
+            style="
+            position: fixed;
+            bottom: 20px;
+            right: 84px;
+            z-index: 9999;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: none;
+            background: #ef4444;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,0,0,.25);
+        ">
+        ⏹️
+    </button>
+
+    <!-- ========================= -->
+    <!-- 🎧 SCRIPT DE AUDIO -->
+    <!-- ========================= -->
+    <script>
+        let voces = [];
+        let vozES = null;
+
+        /* Cargar voces del navegador */
+        function cargarVoces() {
+            voces = speechSynthesis.getVoices() || [];
+            vozES =
+                voces.find(v => (v.lang || "").toLowerCase().startsWith("es")) ||
+                voces[0] || null;
+
+            console.log("Voces:", voces.map(v => `${v.name} (${v.lang})`));
+            console.log("Voz usada:", vozES ? vozES.name : "NINGUNA");
+        }
+
+        cargarVoces();
+        speechSynthesis.onvoiceschanged = cargarVoces;
+
+        /* 🔊 Leer pantalla */
+        function leerPagina() {
+
+            // Lee solo <main> si existe, si no todo
+            const cont = document.querySelector("main") || document.body;
+            let texto = (cont.innerText || "").trim();
+
+            if (!texto) {
+                texto = "Pantalla del sistema UISEK.";
+            }
+
+            // Parar cualquier audio previo
+            speechSynthesis.cancel();
+
+            const u = new SpeechSynthesisUtterance(texto);
+            u.lang = "es-ES";
+            if (vozES) u.voice = vozES;
+            u.rate = 1;
+            u.pitch = 1;
+
+            u.onstart = () => console.log("🔊 Lectura iniciada");
+            u.onend = () => console.log("✅ Lectura finalizada");
+            u.onerror = e => console.log("❌ Error TTS", e);
+
+            speechSynthesis.speak(u);
+        }
+
+        /* ⏹️ Detener lectura */
+        function detenerLectura() {
+            speechSynthesis.cancel();
+            console.log("⏹️ Lectura detenida");
+        }
+
+        /* 🎹 Accesos rápidos */
+        document.addEventListener("keydown", function (e) {
+            if (e.key.toLowerCase() === "l") {
+                leerPagina();          // L = Leer
+            }
+            if (e.key === "Escape") {
+                detenerLectura();      // ESC = Detener
+            }
+        });
+
+        /* 🛑 Detener al cambiar de página */
+        window.addEventListener("beforeunload", function () {
+            speechSynthesis.cancel();
+        });
+    </script>
+
+
 </body>
 </html>
